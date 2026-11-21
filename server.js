@@ -40,6 +40,7 @@ const Product = mongoose.model('Product', new mongoose.Schema({
 const User = mongoose.model('User', new mongoose.Schema({
   name: String,
   email: { type: String, unique: true },
+  phone: { type: String, default: '' },
   passwordHash: String,
   isPremium: { type: Boolean, default: false },
   lastSpinDate: String,
@@ -48,12 +49,22 @@ const User = mongoose.model('User', new mongoose.Schema({
 
 const Cart = mongoose.model('Cart', new mongoose.Schema({
   sessionId: { type: String, unique: true },
-  items: [{ productId: String, name: String, price: Number, premiumPrice: Number, quantity: Number }]
+  items: [{
+    productId: String,
+    name: String,
+    category: String,
+    price: Number,
+    premiumPrice: Number,
+    quantity: Number
+  }]
 }));
 
 const Order = mongoose.model('Order', new mongoose.Schema({
   orderId: String,
+  userName: String,
   userEmail: String,
+  userPhone: String,
+  deliveryType: { type: String, default: 'hybrid' },
   items: Array,
   subtotal: Number,
   discount: Number,
@@ -82,6 +93,18 @@ const wheelPrizes = [
   { segment: 5, color: 'Green', label: '50% OFF Jackpot!', code: 'JACKPOT50', discountPercent: 50, weight: 5 }
 ];
 
+// Helpers
+function escapeRegex(str = '') {
+  return String(str).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function normalizeIndianPhone(raw = '') {
+  let digits = String(raw).replace(/\D/g, '');
+  if (digits.length === 12 && digits.startsWith('91')) digits = digits.slice(2);
+  if (digits.length === 11 && digits.startsWith('0')) digits = digits.slice(1);
+  return /^\d{10}$/.test(digits) ? digits : null;
+}
+
 async function getAuthUser(req) {
   const authHeader = req.headers.authorization;
   if (!authHeader) return null;
@@ -99,10 +122,10 @@ app.get('/api/products', async (req, res) => {
     if ((await Product.countDocuments()) === 0) await Product.insertMany(initialProducts);
     const { category, tag, q } = req.query;
     const filter = {};
-    if (category) filter.category = new RegExp(`^${category}$`, 'i');
-    if (tag) filter.tag = new RegExp(tag, 'i');
+    if (category) filter.category = new RegExp(`^${escapeRegex(category)}$`, 'i');
+    if (tag) filter.tag = new RegExp(escapeRegex(tag), 'i');
     if (q) {
-      const r = new RegExp(q, 'i');
+      const r = new RegExp(escapeRegex(q), 'i');
       filter.$or = [{ name: r }, { category: r }, { tag: r }];
     }
     const products = await Product.find(filter).lean();
@@ -114,23 +137,52 @@ app.get('/api/products', async (req, res) => {
 
 app.post('/api/auth', async (req, res) => {
   try {
-    const { action, name, email, password } = req.body;
-    if (!email || !password) return res.status(400).json({ error: 'Email and password required' });
-
-    if (action === 'register') {
-      if (await User.findOne({ email })) return res.status(409).json({ error: 'Email already registered' });
-      const passwordHash = await bcrypt.hash(password, 10);
-      const u = await User.create({ name: name || 'Player', email, passwordHash });
-      const token = jwt.sign({ id: u._id }, JWT_SECRET, { expiresIn: '7d' });
-      return res.status(201).json({ token, user: { id: u._id, name: u.name, email, isPremium: false } });
+    const { action, name, email, password, phone, mobile } = req.body;
+    const cleanEmail = String(email || '').trim().toLowerCase();
+    if (!cleanEmail || !password) {
+      return res.status(400).json({ error: 'Email and password required' });
     }
 
-    const user = await User.findOne({ email });
+    const emailQuery = { email: new RegExp(`^${escapeRegex(cleanEmail)}$`, 'i') };
+
+    if (action === 'register') {
+      const cleanPhone = normalizeIndianPhone(phone || mobile);
+      if (!cleanPhone) {
+        return res.status(400).json({ error: 'Please enter a valid 10-digit mobile number' });
+      }
+      if (await User.findOne(emailQuery)) {
+        return res.status(409).json({ error: 'Email already registered' });
+      }
+
+      const passwordHash = await bcrypt.hash(password, 10);
+      const u = await User.create({
+        name: String(name || 'Player').trim(),
+        email: cleanEmail,
+        phone: cleanPhone,
+        passwordHash
+      });
+      const token = jwt.sign({ id: u._id }, JWT_SECRET, { expiresIn: '7d' });
+      return res.status(201).json({
+        token,
+        user: { id: u._id, name: u.name, email: u.email, phone: u.phone, isPremium: false }
+      });
+    }
+
+    const user = await User.findOne(emailQuery);
     if (!user || !(await bcrypt.compare(password, user.passwordHash))) {
       return res.status(401).json({ error: 'Invalid email or password' });
     }
     const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: '7d' });
-    res.json({ token, user: { id: user._id, name: user.name, email: user.email, isPremium: user.isPremium } });
+    res.json({
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone || '',
+        isPremium: user.isPremium
+      }
+    });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -174,21 +226,51 @@ app.post('/api/premium', async (req, res) => {
   }
 });
 
+// Add, increment, decrement, or remove bag items (login required)
 app.put('/api/checkout', async (req, res) => {
   try {
-    const { sessionId, productId, quantity = 1 } = req.body;
-    const product = await Product.findById(productId);
-    if (!product) return res.status(404).json({ error: 'Product not found' });
+    const user = await getAuthUser(req);
+    if (!user) {
+      return res.status(401).json({ error: 'Please log in to add or update items in your bag.' });
+    }
+
+    const { sessionId, productId, quantity = 1, action } = req.body;
+    if (!sessionId || !productId) {
+      return res.status(400).json({ error: 'Session ID and Product ID are required' });
+    }
 
     let cart = await Cart.findOne({ sessionId });
     if (!cart) cart = new Cart({ sessionId, items: [] });
 
-    const existing = cart.items.find(i => i.productId === String(productId));
-    if (existing) {
-      existing.quantity += Number(quantity);
-    } else {
-      cart.items.push({ productId: String(product._id), name: product.name, price: product.price, premiumPrice: product.premiumPrice, quantity: Number(quantity) });
+    const pid = String(productId);
+    const delta = Number(quantity);
+
+    if (action === 'remove') {
+      cart.items = cart.items.filter(i => i.productId !== pid);
+      await cart.save();
+      return res.json({ cart: cart.items });
     }
+
+    const existing = cart.items.find(i => i.productId === pid);
+
+    if (existing) {
+      existing.quantity += delta;
+      if (existing.quantity <= 0) {
+        cart.items = cart.items.filter(i => i.productId !== pid);
+      }
+    } else if (delta > 0) {
+      const product = await Product.findById(productId);
+      if (!product) return res.status(404).json({ error: 'Product not found' });
+      cart.items.push({
+        productId: String(product._id),
+        name: product.name,
+        category: product.category,
+        price: product.price,
+        premiumPrice: product.premiumPrice,
+        quantity: delta
+      });
+    }
+
     await cart.save();
     res.json({ cart: cart.items });
   } catch (err) {
@@ -196,33 +278,58 @@ app.put('/api/checkout', async (req, res) => {
   }
 });
 
+// Complete checkout (login + 10-digit mobile number required)
 app.post('/api/checkout', async (req, res) => {
   try {
     const user = await getAuthUser(req);
-    const { sessionId, couponCode } = req.body;
+    if (!user) {
+      return res.status(401).json({ error: 'Please log in to complete checkout.' });
+    }
+
+    const { sessionId, couponCode, deliveryType, phone, mobile } = req.body;
+    const cleanPhone = normalizeIndianPhone(phone || mobile || user.phone);
+    if (!cleanPhone) {
+      return res.status(400).json({ error: 'Please enter a valid 10-digit mobile number for delivery updates.' });
+    }
+
     const cart = await Cart.findOne({ sessionId });
-    if (!cart || cart.items.length === 0) return res.status(400).json({ error: 'Your bag is empty!' });
+    if (!cart || cart.items.length === 0) {
+      return res.status(400).json({ error: 'Your bag is empty!' });
+    }
 
-    const isVip = Boolean(user?.isPremium);
-    const subtotal = cart.items.reduce((sum, i) => sum + (isVip ? i.premiumPrice : i.price) * i.quantity, 0);
+    // Save/update phone on the user profile if missing or updated
+    if (user.phone !== cleanPhone) {
+      user.phone = cleanPhone;
+      await user.save();
+    }
+
+    const isVip = Boolean(user.isPremium);
+    const subtotal = cart.items.reduce(
+      (sum, i) => sum + (isVip ? i.premiumPrice : i.price) * i.quantity,
+      0
+    );
+
     let discount = 0;
-
-    if (couponCode) {
-      const code = couponCode.toUpperCase();
-      const prize = wheelPrizes.find(p => p.code === code);
+    const cleanCode = String(couponCode || '').trim().toUpperCase();
+    if (cleanCode) {
+      const prize = wheelPrizes.find(p => p.code === cleanCode);
       if (prize?.discountPercent) discount = Math.round((subtotal * prize.discountPercent) / 100);
       if (prize?.flatDiscount) discount = prize.flatDiscount;
-      if (code === 'VIPWELCOME25') discount = Math.round(subtotal * 0.25);
+      if (cleanCode === 'VIPWELCOME25') discount = Math.round(subtotal * 0.25);
     }
+    discount = Math.min(subtotal, discount);
 
     const order = await Order.create({
       orderId: `FC-${Date.now().toString().slice(-5)}`,
-      userEmail: user?.email || 'Guest',
+      userName: user.name,
+      userEmail: user.email,
+      userPhone: cleanPhone,
+      deliveryType: deliveryType || 'hybrid',
       items: cart.items,
       subtotal,
       discount,
       finalTotal: Math.max(0, subtotal - discount),
-      couponUsed: couponCode || 'None'
+      couponUsed: cleanCode || 'None'
     });
 
     await Cart.deleteOne({ sessionId });
