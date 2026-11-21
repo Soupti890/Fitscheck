@@ -3,11 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FITS CHECK — Play Bigger. Shop Smarter.</title>
+  <title>FITS CHECK - Play Bigger. Shop Smarter.</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,600;0,700;0,800;0,900;1,800;1,900&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-
   <style>
     :root {
       --bg-dark: #070510;
@@ -70,7 +69,7 @@
       scroll-margin-top: 86px;
     }
 
-    /* ---------------- HEADER / NAVBAR ---------------- */
+    /* ================= HEADER / NAVBAR ================= */
     header {
       position: sticky;
       top: 0;
@@ -101,32 +100,46 @@
     .logo-row {
       display: flex;
       align-items: center;
-      gap: 7px;
+      gap: 10px;
       line-height: 1;
     }
 
     .logo-fc {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 5px 8px;
+      border-radius: 9px;
+      background: linear-gradient(135deg, rgba(157, 37, 247, 0.34), rgba(18, 13, 36, 0.95));
+      border: 1.5px solid rgba(168, 85, 247, 0.85);
+      box-shadow: 0 0 14px rgba(157, 37, 247, 0.38), inset 0 0 8px rgba(157, 37, 247, 0.25);
       font-family: 'Montserrat', sans-serif;
       font-weight: 900;
       font-style: italic;
-      font-size: 24px;
-      letter-spacing: -1px;
-      color: #fff;
-      text-shadow: 0 0 12px var(--neon-glow);
+      font-size: 18px;
+      letter-spacing: -0.5px;
+      color: #ffffff;
     }
 
     .logo-fc span {
-      color: var(--primary-purple);
+      color: #e879f9;
+    }
+
+    .logo-divider {
+      width: 1.5px;
+      height: 22px;
+      background: linear-gradient(180deg, transparent, rgba(168, 85, 247, 0.75), transparent);
+      flex-shrink: 0;
     }
 
     .logo-text {
       font-family: 'Montserrat', sans-serif;
       font-weight: 900;
       font-style: italic;
-      font-size: 20px;
-      letter-spacing: 0.4px;
+      font-size: 19px;
+      letter-spacing: 0.6px;
       text-transform: uppercase;
-      background: linear-gradient(90deg, #ffffff 40%, var(--primary-purple) 100%);
+      background: linear-gradient(90deg, #ffffff 45%, var(--primary-purple) 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
@@ -137,7 +150,7 @@
       text-transform: uppercase;
       color: var(--text-muted);
       font-weight: 700;
-      margin-top: 3px;
+      margin-top: 4px;
     }
 
     .desktop-nav {
@@ -377,7 +390,7 @@
       font-size: 14px;
     }
 
-    /* ---------------- HERO SECTION ---------------- */
+    /* ================= HERO SECTION ================= */
     .hero-section {
       padding: 28px 0 18px;
     }
@@ -612,7 +625,7 @@
       box-shadow: 0 0 16px rgba(157, 37, 247, 0.35);
     }
 
-    /* ---------------- SPIN & WIN WIDGET ---------------- */
+    /* ================= SPIN & WIN WIDGET ================= */
     .spin-win-card {
       background: linear-gradient(160deg, #16102e 0%, #0d091d 100%);
       border: 1.5px solid rgba(139, 92, 246, 0.55);
@@ -752,7 +765,7 @@
       cursor: pointer;
     }
 
-    /* ---------------- VALUE PROPOSITIONS STRIP ---------------- */
+    /* ================= VALUE PROPOSITIONS STRIP ================= */
     .perks-strip {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -795,7 +808,7 @@
       color: var(--text-muted);
     }
 
-    /* ---------------- CATEGORY & LOUNGE ROW ---------------- */
+    /* ================= CATEGORY & LOUNGE ROW ================= */
     .bottom-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr) 1.45fr;
@@ -951,7 +964,7 @@
       color: #090614;
     }
 
-    /* ---------------- DYNAMIC PRODUCTS SHOWCASE ---------------- */
+    /* ================= DYNAMIC PRODUCTS SHOWCASE ================= */
     .products-section {
       padding: 6px 0 42px;
     }
@@ -1066,6 +1079,36 @@
       font-weight: 700;
       padding: 3px 8px;
       border-radius: 999px;
+      z-index: 2;
+    }
+
+    .btn-wishlist-card {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(9, 6, 20, 0.82);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      color: #cbd5e1;
+      font-size: 15px;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      transition: transform 0.15s ease, color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+      z-index: 2;
+    }
+
+    .btn-wishlist-card:hover {
+      transform: scale(1.08);
+      border-color: #f43f5e;
+    }
+
+    .btn-wishlist-card.saved {
+      color: #f43f5e;
+      border-color: #f43f5e;
+      background: rgba(244, 63, 94, 0.18);
     }
 
     .product-body {
@@ -1157,7 +1200,7 @@
     }
 
     .shimmer {
-      background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.11) 50%, rgba(255,255,255,0.04) 75%);
+      background: linear-gradient(90deg, rgba(255, 255, 255, 0.04) 25%, rgba(255, 255, 255, 0.11) 50%, rgba(255, 255, 255, 0.04) 75%);
       background-size: 200% 100%;
       animation: shimmerMove 1.4s infinite linear;
     }
@@ -1185,7 +1228,7 @@
       margin-bottom: 6px;
     }
 
-    /* ---------------- MODALS (AUTH & CART) ---------------- */
+    /* ================= MODALS (AUTH & CART) ================= */
     .modal-overlay {
       position: fixed;
       inset: 0;
@@ -1292,6 +1335,37 @@
     .form-input:focus {
       border-color: var(--primary-purple);
     }
+    .phone-input-group {
+      display: flex;
+      align-items: center;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: rgba(255, 255, 255, 0.06);
+      overflow: hidden;
+    }
+
+    .phone-input-group:focus-within {
+      border-color: var(--primary-purple);
+    }
+
+    .phone-prefix {
+      padding: 0 11px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #e9d5ff;
+      background: rgba(157, 37, 247, 0.18);
+      border-right: 1px solid rgba(255, 255, 255, 0.12);
+      min-height: 44px;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+    }
+
+    .phone-input-group .form-input {
+      border: none;
+      background: transparent;
+      border-radius: 0;
+    }
 
     .pass-toggle {
       position: absolute;
@@ -1331,25 +1405,313 @@
       border: 1px solid rgba(255, 255, 255, 0.16);
     }
 
-    .cart-item-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-      font-size: 13px;
-      padding: 10px 0;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    /* Flipkart / Amazon Style Cart & Wishlist */
+    .cart-modal-box {
+      max-width: 480px;
+      padding: 20px 18px;
     }
 
-    .cart-summary {
+    .cart-items-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 270px;
+      overflow-y: auto;
+      margin-bottom: 12px;
+      padding-right: 2px;
+    }
+
+    .cart-card {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 14px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .cart-card-top {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .cart-thumb {
+      width: 56px;
+      height: 56px;
+      border-radius: 10px;
+      background: radial-gradient(circle, rgba(157, 37, 247, 0.25), #120d24);
+      border: 1px solid rgba(168, 85, 247, 0.28);
+      overflow: hidden;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+    }
+
+    .cart-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .cart-thumb svg {
+      width: 26px;
+      height: 26px;
+      stroke: #c084fc;
+    }
+
+    .cart-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .cart-item-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .cart-item-unit {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .cart-item-line-price {
+      font-size: 15px;
+      font-weight: 800;
+      color: #fff;
+      white-space: nowrap;
+    }
+
+    .cart-card-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding-top: 8px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      flex-wrap: wrap;
+    }
+
+    .qty-stepper {
+      display: inline-flex;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .qty-btn {
+      width: 30px;
+      height: 28px;
+      background: transparent;
+      border: none;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .qty-btn:hover {
+      background: rgba(157, 37, 247, 0.28);
+    }
+
+    .qty-val {
+      min-width: 26px;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .cart-action-links {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .cart-text-btn {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #e2e8f0;
+      border-radius: 8px;
+      padding: 5px 9px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .cart-text-btn:hover {
+      border-color: var(--primary-purple);
+      color: #fff;
+    }
+
+    .cart-text-btn.danger:hover {
+      border-color: var(--red);
+      color: #fca5a5;
+    }
+
+    .coupon-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .coupon-row .form-input {
+      flex: 1;
+      min-height: 40px;
+      font-size: 13px;
+    }
+
+    .btn-apply-coupon {
+      padding: 0 16px;
+      min-height: 40px;
+      border-radius: 10px;
+      border: 1px solid var(--gold);
+      background: rgba(245, 158, 11, 0.16);
+      color: #fde68a;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .btn-apply-coupon:hover {
+      background: var(--gold);
+      color: #090614;
+    }
+
+    .applied-offer-pill {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      background: rgba(16, 185, 129, 0.14);
+      border: 1px solid rgba(16, 185, 129, 0.45);
+      color: #6ee7b7;
+      border-radius: 10px;
+      padding: 7px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    .applied-offer-pill.visible {
+      display: flex;
+    }
+
+    .remove-offer-btn {
+      background: none;
+      border: none;
+      color: #fca5a5;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .price-breakdown {
+      background: rgba(255, 255, 255, 0.035);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      font-size: 13px;
+    }
+
+    .price-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 12px 0;
-      font-size: 14px;
-      font-weight: 700;
-      border-top: 1px solid rgba(255, 255, 255, 0.14);
+      color: #cbd5e1;
+    }
+
+    .price-row.discount {
+      color: #34d399;
+      font-weight: 600;
+    }
+
+    .price-row.net-total {
+      border-top: 1px dashed rgba(255, 255, 255, 0.18);
+      padding-top: 8px;
+      margin-top: 2px;
+      font-size: 15px;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .bag-wishlist-section {
+      margin-top: 16px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .bag-wishlist-title {
+      font-size: 13px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: #e9d5ff;
       margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .wishlist-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      background: rgba(255, 255, 255, 0.035);
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      border-radius: 12px;
+      padding: 9px 10px;
+      margin-bottom: 8px;
+    }
+
+    .wishlist-meta {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .wishlist-name {
+      font-size: 12px;
+      font-weight: 700;
+      color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .wishlist-price {
+      font-size: 12px;
+      color: var(--gold);
+      font-weight: 700;
+    }
+
+    .wishlist-btns {
+      display: flex;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .btn-move-bag {
+      background: var(--primary-purple);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 6px 9px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
     }
 
     .receipt-box {
@@ -1372,7 +1734,7 @@
       margin-bottom: 12px;
     }
 
-    /* ---------------- TOAST NOTIFICATIONS ---------------- */
+    /* ================= TOAST NOTIFICATIONS ================= */
     #toastContainer {
       position: fixed;
       bottom: 20px;
@@ -1423,7 +1785,7 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* ---------------- FOOTER ---------------- */
+    /* ================= FOOTER ================= */
     footer {
       margin-top: auto;
       background: #090614;
@@ -1435,13 +1797,11 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      flex-wrap: wrap;
       gap: 10px;
       font-size: 11px;
       letter-spacing: 0.9px;
-      font-weight: 600;
     }
-
+    
     .footer-highlight {
       color: #c084fc;
       letter-spacing: 2px;
@@ -1452,7 +1812,7 @@
       color: var(--text-muted);
     }
 
-    /* ---------------- RESPONSIVE BREAKPOINTS ---------------- */
+    /* ================= RESPONSIVE BREAKPOINTS ================= */
     @media (max-width: 1120px) {
       .desktop-nav {
         display: none;
@@ -1497,9 +1857,23 @@
         gap: 8px;
       }
 
-      .logo-fc { font-size: 21px; }
-      .logo-text { font-size: 17px; }
-      .sub-brand { font-size: 7px; letter-spacing: 1.4px; }
+      .logo-fc {
+        font-size: 15px;
+        padding: 4px 7px;
+      }
+
+      .logo-divider {
+        height: 18px;
+      }
+
+      .logo-text {
+        font-size: 16px;
+      }
+
+      .sub-brand {
+        font-size: 7px;
+        letter-spacing: 1.4px;
+      }
 
       .desktop-search-wrap {
         display: none;
@@ -1583,13 +1957,13 @@
   </style>
 </head>
 <body>
-
-  <!-- NAVBAR -->
+    <!-- NAVBAR -->
   <header>
     <div class="container header-inner">
       <a href="#top" class="brand-logo" onclick="handleNavFilter(event)">
         <div class="logo-row">
           <span class="logo-fc">F<span>C</span></span>
+          <span class="logo-divider" aria-hidden="true"></span>
           <span class="logo-text">FITS CHECK</span>
         </div>
         <span class="sub-brand">POWERED BY WELL BENGAL</span>
@@ -1598,7 +1972,7 @@
       <nav class="desktop-nav" aria-label="Primary">
         <a href="#top" class="nav-item active" onclick="handleNavFilter(event)">Home</a>
         <a href="#shopSection" class="nav-item" onclick="handleNavFilter(event, {}, 'Trending Collection', true)">Shop</a>
-        <a href="#spinSection" class="nav-item">Spin & Win</a>
+        <a href="#spinSection" class="nav-item">Spin &amp; Win</a>
         <a href="#loungeCard" class="nav-item">Premium Lounge</a>
         <a href="#shopSection" class="nav-item" onclick="handleNavFilter(event, { category: 'combo-packs' }, 'Combo Packs', true)">Combos</a>
       </nav>
@@ -1608,7 +1982,7 @@
           <form class="search-box" onsubmit="handleSearchSubmit(event, 'searchInput')">
             <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
             <input type="text" id="searchInput" placeholder="Search jerseys, shoes..." autocomplete="off">
-            <button type="button" class="search-clear" id="searchClearDesktop" onclick="clearSearch()" aria-label="Clear search">✕</button>
+            <button type="button" class="search-clear" id="searchClearDesktop" onclick="clearSearch()" aria-label="Clear search">×</button>
           </form>
           <div class="search-dropdown" id="searchDropdownDesktop"></div>
         </div>
@@ -1637,7 +2011,7 @@
         <form class="search-box" onsubmit="handleSearchSubmit(event, 'searchInputMobile')">
           <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
           <input type="text" id="searchInputMobile" placeholder="Search jerseys, shoes, kits..." autocomplete="off">
-          <button type="button" class="search-clear" id="searchClearMobile" onclick="clearSearch()" aria-label="Clear search">✕</button>
+          <button type="button" class="search-clear" id="searchClearMobile" onclick="clearSearch()" aria-label="Clear search">×</button>
         </form>
         <div class="search-dropdown" id="searchDropdownMobile"></div>
       </div>
@@ -1645,11 +2019,11 @@
 
     <!-- Mobile Navigation Drawer -->
     <nav class="mobile-drawer" id="mobileDrawer" aria-label="Mobile navigation">
-      <a href="#top" class="nav-item active" onclick="handleNavFilter(event); closeMobileMenu()">🏠 Home</a>
-      <a href="#shopSection" class="nav-item" onclick="handleNavFilter(event, {}, 'Trending Collection', true); closeMobileMenu()">🛍️ Shop All</a>
-      <a href="#spinSection" class="nav-item" onclick="closeMobileMenu()">🎡 Spin & Win</a>
-      <a href="#loungeCard" class="nav-item" onclick="closeMobileMenu()">👑 Premium Lounge</a>
-      <a href="#shopSection" class="nav-item" onclick="handleNavFilter(event, { category: 'combo-packs' }, 'Combo Packs', true); closeMobileMenu()">🎁 Combo Packs</a>
+      <a href="#top" class="nav-item active" onclick="handleNavFilter(event); closeMobileMenu()">Home</a>
+      <a href="#shopSection" class="nav-item" onclick="handleNavFilter(event, {}, 'Trending Collection', true); closeMobileMenu()">Shop All</a>
+      <a href="#spinSection" class="nav-item" onclick="closeMobileMenu()">Spin &amp; Win</a>
+      <a href="#loungeCard" class="nav-item" onclick="closeMobileMenu()">Premium Lounge</a>
+      <a href="#shopSection" class="nav-item" onclick="handleNavFilter(event, { category: 'combo-packs' }, 'Combo Packs', true); closeMobileMenu()">Combo Packs</a>
     </nav>
   </header>
 
@@ -1663,8 +2037,8 @@
           <p class="hero-tags">Jerseys <span>•</span> Shoes <span>•</span> Kits <span>•</span> Combos</p>
           <p class="hero-subtitle">Your Ultimate Sports Fashion Destination — Only at <strong>FITS CHECK</strong>.</p>
           <div class="hero-cta-row">
-            <button class="btn-explore" id="exploreBtn">Explore Collection ➔</button>
-            <a href="#spinSection" class="btn-ghost">🎡 Spin & Win</a>
+            <button class="btn-explore" id="exploreBtn">Explore Collection →</button>
+            <a href="#spinSection" class="btn-ghost">🎡 Spin &amp; Win</a>
           </div>
         </div>
 
@@ -1672,7 +2046,7 @@
         <div class="hero-showcase">
           <div class="drop-stage">
             <button type="button" class="athlete-badge" onclick="filterAndScroll({ category: 'jerseys' }, 'Mbappé • Messi • CR7 Editions')">
-              🔥 MBAPPÉ • MESSI • CR7 EDITIONS ➔
+              🔥 MBAPPÉ • MESSI • CR7 EDITIONS →
             </button>
 
             <div class="stage-visual" id="stageVisual">
@@ -1688,7 +2062,7 @@
                 </defs>
               </svg>
               <div class="stage-label" id="stageTitle">RETRO HIGH EDITION</div>
-              <div class="stage-sub" id="stageSub">Tap a silhouette below to preview & filter</div>
+              <div class="stage-sub" id="stageSub">Tap a silhouette below to preview &amp; filter</div>
             </div>
 
             <div class="sneakers-row">
@@ -1701,16 +2075,16 @@
 
         <!-- Spin & Win Widget -->
         <div class="spin-win-card" id="spinSection">
-          <h3 class="spin-title">SPIN & <span>WIN</span> 👑</h3>
+          <h3 class="spin-title">SPIN &amp; <span>WIN</span> 👑</h3>
           <p class="spin-subtitle">Spin to unlock instant coupon codes!</p>
 
           <div class="wheel-wrapper">
             <div class="pointer" aria-hidden="true"></div>
             <div class="wheel" id="wheel">
               <div class="wheel-slice-label" style="transform: rotate(36deg);">🔥 DEAL</div>
-              <div class="wheel-slice-label" style="transform: rotate(108deg);">⚡ 10-20%</div>
-              <div class="wheel-slice-label" style="transform: rotate(180deg);">🎁 BONUS</div>
-              <div class="wheel-slice-label" style="transform: rotate(252deg);">💎 DROP</div>
+              <div class="wheel-slice-label" style="transform: rotate(108deg);">🎁 10-20%</div>
+              <div class="wheel-slice-label" style="transform: rotate(180deg);">✨ BONUS</div>
+              <div class="wheel-slice-label" style="transform: rotate(252deg);">⚡ DROP</div>
               <div class="wheel-slice-label" style="transform: rotate(324deg);">👑 VIP</div>
             </div>
             <button class="wheel-center-btn" id="spinBtn">SPIN<br>NOW</button>
@@ -1730,7 +2104,7 @@
           </div>
           <div>
             <div class="perk-title">Budget Friendly</div>
-            <div class="perk-desc">₹80 — ₹1,200</div>
+            <div class="perk-desc">₹80 – ₹1,200</div>
           </div>
         </div>
 
@@ -1740,7 +2114,7 @@
           </div>
           <div>
             <div class="perk-title">Combo Packs</div>
-            <div class="perk-desc">Bundle & Save</div>
+            <div class="perk-desc">Bundle &amp; Save</div>
           </div>
         </div>
 
@@ -1750,7 +2124,7 @@
           </div>
           <div>
             <div class="perk-title">Pan-India Delivery</div>
-            <div class="perk-desc">Fast & Tracked</div>
+            <div class="perk-desc">Fast &amp; Tracked</div>
           </div>
         </div>
 
@@ -1760,7 +2134,7 @@
           </div>
           <div>
             <div class="perk-title">Secure Checkout</div>
-            <div class="perk-desc">& Easy Returns</div>
+            <div class="perk-desc">&amp; Easy Returns</div>
           </div>
         </div>
       </div>
@@ -1775,7 +2149,7 @@
           </div>
           <div class="category-info">
             <h4>Jerseys</h4>
-            <span>Shop Now ➔</span>
+            <span>Shop Now →</span>
           </div>
         </button>
 
@@ -1785,7 +2159,7 @@
           </div>
           <div class="category-info">
             <h4>Sports Kits</h4>
-            <span>Shop Now ➔</span>
+            <span>Shop Now →</span>
           </div>
         </button>
 
@@ -1795,7 +2169,7 @@
           </div>
           <div class="category-info">
             <h4>Shoes</h4>
-            <span>Shop Now ➔</span>
+            <span>Shop Now →</span>
           </div>
         </button>
 
@@ -1805,7 +2179,7 @@
           </div>
           <div class="category-info">
             <h4>Combo Packs</h4>
-            <span>Shop Now ➔</span>
+            <span>Shop Now →</span>
           </div>
         </button>
 
@@ -1820,7 +2194,7 @@
                   <h3>PREMIUM LOUNGE</h3>
                 </div>
               </div>
-              <div class="lounge-price">₹21 <span>/ mo</span></div>
+              <div class="lounge-price">₹21<span>/mo</span></div>
             </div>
             <div class="lounge-perks" style="margin-top: 10px;">
               <span>✓ Member-Only Pricing</span>
@@ -1828,7 +2202,7 @@
               <span>✓ Bonus Coupon</span>
             </div>
           </div>
-          <button class="btn-join-lounge" id="joinLoungeBtn">Join Premium Lounge ➔</button>
+          <button class="btn-join-lounge" id="joinLoungeBtn">Join Premium Lounge →</button>
         </div>
       </div>
     </section>
@@ -1846,7 +2220,7 @@
   <!-- AUTH / PROFILE MODAL -->
   <div class="modal-overlay" id="authModal" onclick="handleBackdropClose(event, 'authModal')">
     <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="authModalTitle">
-      <button class="modal-close" onclick="closeModal('authModal')" aria-label="Close">✕</button>
+      <button class="modal-close" onclick="closeModal('authModal')" aria-label="Close">×</button>
       <h3 id="authModalTitle">Player Account</h3>
 
       <!-- Signed-Out View -->
@@ -1859,6 +2233,12 @@
         <form id="authForm" onsubmit="submitAuth(event)">
           <div class="field-wrap" id="authNameWrap" style="display: none;">
             <input type="text" id="authName" class="form-input" placeholder="Your Full Name">
+          </div>
+          <div class="field-wrap" id="authPhoneWrap" style="display: none;">
+            <div class="phone-input-group">
+              <span class="phone-prefix">+91</span>
+              <input type="tel" id="authPhone" class="form-input" placeholder="10-digit Mobile Number" maxlength="10" inputmode="numeric" autocomplete="tel-national">
+            </div>
           </div>
           <div class="field-wrap">
             <input type="email" id="authEmail" class="form-input" placeholder="Email Address" required>
@@ -1877,6 +2257,7 @@
         <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 14px; margin-bottom: 14px;">
           <div style="font-size: 15px; font-weight: 700;" id="profileName"></div>
           <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;" id="profileEmail"></div>
+          <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;" id="profilePhone"></div>
           <div style="font-size: 12px; color: var(--gold); font-weight: 700; margin-top: 8px;" id="profileTier"></div>
         </div>
         <button type="button" class="modal-btn modal-btn-secondary" onclick="logoutUser()">Log Out</button>
@@ -1886,26 +2267,63 @@
 
   <!-- SHOPPING BAG MODAL -->
   <div class="modal-overlay" id="cartModal" onclick="handleBackdropClose(event, 'cartModal')">
-    <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="cartModalTitle">
-      <button class="modal-close" onclick="closeModal('cartModal')" aria-label="Close">✕</button>
+    <div class="modal-box cart-modal-box" role="dialog" aria-modal="true" aria-labelledby="cartModalTitle">
+      <button class="modal-close" onclick="closeModal('cartModal')" aria-label="Close">×</button>
       <h3 id="cartModalTitle">🛍️ Your Shopping Bag</h3>
 
       <div id="cartMainView">
-        <div id="cartItemsList" style="max-height: 220px; overflow-y: auto; margin-bottom: 8px;"></div>
-        <div class="cart-summary" id="cartSummary" style="display: none;">
-          <span>Estimated Subtotal</span>
-          <span id="cartSubtotal">₹0</span>
-        </div>
-        <div class="field-wrap">
+        <div id="cartItemsList" class="cart-items-list"></div>
+
+        <!-- Coupon / Spin Wheel Offer -->
+        <div class="coupon-row">
           <input type="text" id="couponInput" class="form-input" placeholder="Coupon Code (e.g. SPIN20)">
+          <button type="button" class="btn-apply-coupon" onclick="applyCouponFromInput()">Apply</button>
         </div>
-        <button class="modal-btn" id="checkoutBtn" onclick="checkoutOrder()">Secure Checkout ➔</button>
+
+        <div id="appliedOfferPill" class="applied-offer-pill">
+          <span id="appliedOfferText"></span>
+          <button type="button" class="remove-offer-btn" onclick="removeAppliedOffer()">Remove</button>
+        </div>
+
+        <!-- Price Breakdown -->
+        <div class="price-breakdown" id="cartSummary" style="display: none;">
+          <div class="price-row">
+            <span>Bag Subtotal (<span id="cartItemCount">0</span> items)</span>
+            <span id="cartSubtotal">₹0</span>
+          </div>
+          <div class="price-row discount" id="cartDiscountRow" style="display: none;">
+            <span id="cartDiscountLabel">Wheel / Coupon Discount</span>
+            <span id="cartDiscountAmt">-₹0</span>
+          </div>
+          <div class="price-row net-total">
+            <span>Net Payable Amount</span>
+            <span id="cartNetTotal">₹0</span>
+          </div>
+        </div>
+
+        <!-- Delivery Mobile Number -->
+        <div class="field-wrap" id="checkoutPhoneWrap">
+          <div class="phone-input-group">
+            <span class="phone-prefix">+91</span>
+            <input type="tel" id="checkoutPhone" class="form-input" placeholder="Delivery Mobile Number (10 digits)" maxlength="10" inputmode="numeric" autocomplete="tel-national">
+          </div>
+        </div>
+        <button class="modal-btn" id="checkoutBtn" onclick="checkoutOrder()">Secure Checkout →</button>
         <p id="checkoutStatus" style="font-size: 12px; color: var(--red); margin-top: 10px; min-height: 16px;"></p>
+
+        <!-- Saved Wishlist at Bottom of Bag -->
+        <div class="bag-wishlist-section" id="bagWishlistSection">
+          <div class="bag-wishlist-title">
+            <span>❤️ Saved Wishlist</span>
+            <span id="wishlistCountLabel" style="color: var(--text-muted); font-size: 11px;">0 items</span>
+          </div>
+          <div id="cartWishlistList"></div>
+        </div>
       </div>
 
       <div id="cartReceiptView" style="display: none;">
         <div class="receipt-box">
-          <h4>✓ Order Confirmed!</h4>
+          <h4>🎉 Order Confirmed!</h4>
           <p id="receiptDetails"></p>
           <button type="button" class="modal-btn" onclick="closeModal('cartModal')">Continue Shopping</button>
         </div>
@@ -1915,7 +2333,7 @@
 
   <!-- TOAST CONTAINER -->
   <div id="toastContainer" aria-live="polite"></div>
-  
+
   <!-- FOOTER -->
   <footer>
     <div class="container footer-inner">
@@ -1923,10 +2341,9 @@
       <div class="footer-hashtags">#FITSCHECK &nbsp; #PlayShopWin &nbsp; #PoweredByWellBengal</div>
     </div>
   </footer>
-  
-  <script>
-    const API_BASE = 'https://fitscheck.onrender.com/api';
 
+<script>
+    const API_BASE = 'https://fitscheck.onrender.com/api';
     const sessionId = localStorage.getItem('fc_session') || ('sess_' + Math.random().toString(36).slice(2));
     localStorage.setItem('fc_session', sessionId);
 
@@ -1944,9 +2361,34 @@
     let authMode = 'login';
     let allProductsCache = [];
     let currentCart = JSON.parse(localStorage.getItem('fc_cart_' + sessionId) || '[]');
+    let wishlist = JSON.parse(localStorage.getItem('fc_wishlist_' + sessionId) || '[]');
+    let activeOffer = JSON.parse(localStorage.getItem('fc_active_offer_' + sessionId) || 'null');
+    let pendingCartAction = null;
     let activeFetchController = null;
     let searchDebounceTimer = null;
 
+    function getItemId(item) {
+      return String(item.productId || item._id || item.id || '');
+    }
+
+    function saveWishlist() {
+      localStorage.setItem('fc_wishlist_' + sessionId, JSON.stringify(wishlist));
+    }
+
+    function saveActiveOffer() {
+      if (activeOffer) {
+        localStorage.setItem('fc_active_offer_' + sessionId, JSON.stringify(activeOffer));
+      } else {
+        localStorage.removeItem('fc_active_offer_' + sessionId);
+      }
+    }
+
+function normalizeIndianPhone(raw = '') {
+      let digits = String(raw).replace(/\D/g, '');
+      if (digits.length === 12 && digits.startsWith('91')) digits = digits.slice(2);
+      if (digits.length === 11 && digits.startsWith('0')) digits = digits.slice(1);
+      return /^\d{10}$/.test(digits) ? digits : null;
+    }
     function escapeHtml(str = '') {
       return String(str)
         .replace(/&/g, '&amp;')
@@ -1956,7 +2398,89 @@
         .replace(/'/g, '&#39;');
     }
 
-    // Toast Utility (replaces all window.alert dialogs)
+    // Parse discount from Spin & Win prize object or coupon code (e.g. SPIN20, FLAT100, 15% OFF)
+    function parseDiscountOffer(code, label = '', prizeObj = null) {
+      const cleanCode = String(code || '').trim().toUpperCase();
+      if (!cleanCode) return null;
+
+      if (prizeObj) {
+        if (prizeObj.discountAmount || prizeObj.flatDiscount) {
+          const val = Number(prizeObj.discountAmount || prizeObj.flatDiscount);
+          return { code: cleanCode, label: label || `₹${val} OFF`, type: 'flat', value: val };
+        }
+        if (prizeObj.discountPercent || prizeObj.percent) {
+          const val = Number(prizeObj.discountPercent || prizeObj.percent);
+          return { code: cleanCode, label: label || `${val}% OFF`, type: 'percent', value: val };
+        }
+      }
+
+      const combined = `${label} ${cleanCode}`;
+      const flatMatch = combined.match(/(?:flat\s*₹?\s*|₹\s*|rs\.?\s*)(\d+)/i);
+      if (flatMatch) {
+        const val = Number(flatMatch[1]);
+        return { code: cleanCode, label: label || `₹${val} OFF`, type: 'flat', value: val };
+      }
+
+      const pctMatch = combined.match(/(\d{1,2})\s*%/);
+      if (pctMatch) {
+        const val = Number(pctMatch[1]);
+        return { code: cleanCode, label: label || `${val}% OFF`, type: 'percent', value: val };
+      }
+
+      const codeDigits = cleanCode.match(/(\d{1,3})$/);
+      if (codeDigits) {
+        const val = Number(codeDigits[1]);
+        const isFlat = /FLAT|RS|INR|CASH/i.test(cleanCode) || val > 50;
+        return {
+          code: cleanCode,
+          label: label || (isFlat ? `₹${val} OFF` : `${val}% OFF`),
+          type: isFlat ? 'flat' : 'percent',
+          value: val
+        };
+      }
+
+      return { code: cleanCode, label: label || 'Special Offer Applied', type: 'perk', value: 0 };
+    }
+
+    function applyOfferObject(offer, notify = true) {
+      activeOffer = offer;
+      saveActiveOffer();
+      const input = document.getElementById('couponInput');
+      if (input && offer) input.value = offer.code;
+      if (document.getElementById('cartModal').classList.contains('open')) {
+        renderCartModal();
+      }
+      if (notify && offer) {
+        showToast(`Offer ${offer.code} (${offer.label}) applied to your bag!`, 'gold');
+      }
+    }
+
+    function applyCouponFromInput() {
+      const code = document.getElementById('couponInput').value.trim();
+      if (!code) {
+        showToast('Enter a coupon code first.', 'error');
+        return;
+      }
+      const offer = parseDiscountOffer(code);
+      applyOfferObject(offer, true);
+    }
+
+    function removeAppliedOffer() {
+      activeOffer = null;
+      saveActiveOffer();
+      document.getElementById('couponInput').value = '';
+      renderCartModal();
+      showToast('Coupon removed from bag.');
+    }
+
+    document.getElementById('couponInput').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        applyCouponFromInput();
+      }
+    });
+
+    // Toast Utility
     function showToast(message, variant = 'default', actionLabel = '', onAction = null) {
       const container = document.getElementById('toastContainer');
       const toast = document.createElement('div');
@@ -1987,6 +2511,9 @@
 
     function copyCoupon(code) {
       document.getElementById('couponInput').value = code;
+      if (!activeOffer || activeOffer.code !== String(code).toUpperCase()) {
+        applyOfferObject(parseDiscountOffer(code), false);
+      }
       if (navigator.clipboard) {
         navigator.clipboard.writeText(code).catch(() => {});
       }
@@ -1998,11 +2525,9 @@
       try {
         const res = await fetch(`${API_BASE}${endpoint}`, options);
         const contentType = res.headers.get('content-type') || '';
-
         if (!contentType.includes('application/json')) {
           throw new Error('Server is waking up. Please try again in a few seconds.');
         }
-
         const data = await res.json();
         return { ok: res.ok, status: res.status, data };
       } catch (err) {
@@ -2035,15 +2560,15 @@
       if (savedUser) {
         userLabel.textContent = savedUser.isPremium ? `👑 ${savedUser.name}` : savedUser.name;
         if (savedUser.isPremium) {
-          joinLoungeBtn.textContent = '✓ Lounge VIP Active';
+          joinLoungeBtn.textContent = '👑 Lounge VIP Active';
           joinLoungeBtn.classList.add('active-vip');
         } else {
-          joinLoungeBtn.textContent = 'Join Premium Lounge ➔';
+          joinLoungeBtn.textContent = 'Join Premium Lounge →';
           joinLoungeBtn.classList.remove('active-vip');
         }
       } else {
         userLabel.textContent = '';
-        joinLoungeBtn.textContent = 'Join Premium Lounge ➔';
+        joinLoungeBtn.textContent = 'Join Premium Lounge →';
         joinLoungeBtn.classList.remove('active-vip');
       }
     }
@@ -2064,7 +2589,6 @@
     function selectDrop(btn, name, color1, color2, subtitle) {
       document.querySelectorAll('.sneaker-item').forEach(el => el.classList.remove('active'));
       btn.classList.add('active');
-
       const stage = document.getElementById('stageVisual');
       stage.classList.add('switching');
       setTimeout(() => {
@@ -2074,7 +2598,6 @@
         document.getElementById('stageSub').textContent = subtitle;
         stage.classList.remove('switching');
       }, 150);
-
       loadProducts({ tag: name }, `Sneaker Drop: ${name}`);
     }
 
@@ -2109,7 +2632,6 @@
 
     function renderProductCards(products, titleText) {
       catalogTitle.textContent = `${titleText} (${products.length})`;
-
       if (!products.length) {
         productsGrid.innerHTML = `
           <div class="state-banner">
@@ -2129,7 +2651,7 @@
         const tag = escapeHtml(p.tag || p.category || 'Sports');
         const imgUrl = p.image || p.imageUrl || '';
         const savings = Math.max(0, Number(p.price) - Number(p.premiumPrice));
-
+        const isWishlisted = wishlist.some(w => getItemId(w) === pid);
         const mediaHtml = imgUrl
           ? `<img src="${escapeHtml(imgUrl)}" alt="${name}" loading="lazy" decoding="async">`
           : `<div class="product-fallback-art">
@@ -2142,6 +2664,9 @@
             <div class="product-media">
               ${mediaHtml}
               ${savings > 0 ? `<span class="vip-save-badge">👑 VIP Save ₹${savings}</span>` : ''}
+              <button type="button" class="btn-wishlist-card ${isWishlisted ? 'saved' : ''}" data-wish-id="${pid}" onclick="toggleWishlistFromCatalog('${pid}', this)" aria-label="Save to wishlist">
+                ${isWishlisted ? '♥' : '♡'}
+              </button>
             </div>
             <div class="product-body">
               <div>
@@ -2225,8 +2750,16 @@
 
     // Live Search with Instant Dropdown + Local/API Sync
     const searchInputs = [
-      { input: document.getElementById('searchInput'), clear: document.getElementById('searchClearDesktop'), drop: document.getElementById('searchDropdownDesktop') },
-      { input: document.getElementById('searchInputMobile'), clear: document.getElementById('searchClearMobile'), drop: document.getElementById('searchDropdownMobile') }
+      {
+        input: document.getElementById('searchInput'),
+        clear: document.getElementById('searchClearDesktop'),
+        drop: document.getElementById('searchDropdownDesktop')
+      },
+      {
+        input: document.getElementById('searchInputMobile'),
+        clear: document.getElementById('searchClearMobile'),
+        drop: document.getElementById('searchDropdownMobile')
+      }
     ];
 
     function closeSearchDropdowns() {
@@ -2238,7 +2771,6 @@
         dropdownEl.classList.remove('open');
         return;
       }
-
       const q = query.toLowerCase();
       const matches = allProductsCache.filter(p =>
         (p.name || '').toLowerCase().includes(q) ||
@@ -2290,22 +2822,24 @@
       if (reload) loadProducts({}, '🔥 Trending Collection');
     }
 
-    searchInputs.forEach(({ input, clear, drop }) => {
+    searchInputs.forEach(({ input, drop }) => {
       input.addEventListener('input', (e) => {
         const val = e.target.value;
         searchInputs.forEach(other => {
           if (other.input !== input) other.input.value = val;
           other.clear.classList.toggle('visible', val.trim().length > 0);
         });
-
         renderSearchDropdown(val.trim(), drop);
 
         clearTimeout(searchDebounceTimer);
         searchDebounceTimer = setTimeout(() => {
           const q = val.trim();
           if (!q) {
-            if (allProductsCache.length) renderProductCards(allProductsCache, '🔥 Trending Collection');
-            else loadProducts();
+            if (allProductsCache.length) {
+              renderProductCards(allProductsCache, '🔥 Trending Collection');
+            } else {
+              loadProducts();
+            }
             return;
           }
           loadProducts({ q }, `Search: "${q}"`);
@@ -2322,7 +2856,7 @@
       document.getElementById('shopSection').scrollIntoView({ behavior: 'smooth' });
     });
 
-    // Spin & Win
+    // Spin & Win (auto-applies won discount to shopping bag net total)
     spinBtn.addEventListener('click', async () => {
       if (isSpinning) return;
       isSpinning = true;
@@ -2348,7 +2882,6 @@
       const currentMod = currentRotation % 360;
       const delta = (5 * 360) + ((targetMod - currentMod + 360) % 360);
       currentRotation += delta;
-
       wheel.style.transform = `rotate(${currentRotation}deg)`;
 
       setTimeout(() => {
@@ -2356,31 +2889,50 @@
         spinBtn.disabled = false;
         const code = data.prize.code;
         const label = data.prize.label;
+
+        const wonOffer = parseDiscountOffer(code, label, data.prize);
+        applyOfferObject(wonOffer, false);
         document.getElementById('couponInput').value = code;
+
         wheelMsg.innerHTML = `
           <span>🎉 Won ${escapeHtml(label)}!</span>
           <button type="button" class="copy-code-btn" onclick="copyCoupon('${escapeHtml(code)}')">Copy ${escapeHtml(code)}</button>
         `;
-        showToast(`Won ${label}! Code ${code} added to your bag.`, 'gold', 'Copy', () => copyCoupon(code));
+        showToast(`Won ${label}! Code ${code} applied to your bag.`, 'gold', 'View Bag', openCartModal);
       }, 4050);
     });
 
-    // Add to Cart with Loading Guard & Tactile Feedback
-    async function addToCart(productId, btnEl) {
-      if (btnEl.disabled) return;
-      const origText = btnEl.textContent;
-      btnEl.disabled = true;
-      btnEl.textContent = 'Adding...';
+    // Add to Cart — requires login first, auto-adds after login
+    async function addToCart(productId, btnEl = null) {
+      const token = localStorage.getItem('fc_token');
+      if (!token) {
+        pendingCartAction = { productId, btnEl };
+        openAuthModal('Log in or sign up to add items to your bag.');
+        showToast('Please log in to add items to your bag.', 'gold');
+        return;
+      }
+
+      if (btnEl && btnEl.disabled) return;
+      const origText = btnEl ? btnEl.textContent : '';
+      if (btnEl) {
+        btnEl.disabled = true;
+        btnEl.textContent = 'Adding...';
+      }
 
       const { ok, data } = await apiRequest('/checkout', {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
         body: JSON.stringify({ sessionId, productId, quantity: 1 })
       });
 
       if (!ok) {
-        btnEl.disabled = false;
-        btnEl.textContent = origText;
+        if (btnEl) {
+          btnEl.disabled = false;
+          btnEl.textContent = origText;
+        }
         showToast(data.error || 'Could not add item to bag.', 'error');
         return;
       }
@@ -2388,57 +2940,318 @@
       currentCart = data.cart || [];
       syncCartBadge(true);
 
-      btnEl.classList.add('added');
-      btnEl.textContent = 'Added ✓';
+      if (btnEl) {
+        btnEl.classList.add('added');
+        btnEl.textContent = 'Added ✓';
+        setTimeout(() => {
+          btnEl.disabled = false;
+          btnEl.classList.remove('added');
+          btnEl.textContent = '+ Add to Bag';
+        }, 1100);
+      }
       showToast('Added to your shopping bag!', 'success', 'View Bag', openCartModal);
-
-      setTimeout(() => {
-        btnEl.disabled = false;
-        btnEl.classList.remove('added');
-        btnEl.textContent = '+ Add to Bag';
-      }, 1100);
     }
 
-    // Shopping Bag Modal
-    function openCartModal() {
+    // Quantity Stepper (+ / -) & Remove inside Bag
+    async function updateCartQty(productId, delta) {
+      const idx = currentCart.findIndex(item => getItemId(item) === String(productId));
+      if (idx === -1) return;
+
+      const prevQty = Number(currentCart[idx].quantity) || 1;
+      const newQty = prevQty + delta;
+      if (newQty <= 0) {
+        await removeFromCart(productId);
+        return;
+      }
+
+      currentCart[idx].quantity = newQty;
+      syncCartBadge(false);
+      renderCartModal();
+
+      const token = localStorage.getItem('fc_token');
+      const { ok, data } = await apiRequest('/checkout', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
+        },
+        body: JSON.stringify({ sessionId, productId, quantity: delta })
+      });
+
+      if (ok && Array.isArray(data.cart)) {
+        const returnedItem = data.cart.find(i => getItemId(i) === String(productId));
+        if (delta > 0 || !returnedItem || Number(returnedItem.quantity) <= newQty) {
+          currentCart = data.cart;
+          syncCartBadge(false);
+          renderCartModal();
+        }
+      }
+    }
+
+    async function removeFromCart(productId) {
+      const item = currentCart.find(i => getItemId(i) === String(productId));
+      const qtyToRemove = item ? -(Number(item.quantity) || 1) : -1;
+
+      currentCart = currentCart.filter(i => getItemId(i) !== String(productId));
+      syncCartBadge(false);
+      renderCartModal();
+      showToast('Item removed from bag.');
+
+      const token = localStorage.getItem('fc_token');
+      await apiRequest('/checkout', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
+        },
+        body: JSON.stringify({ sessionId, productId, quantity: qtyToRemove, action: 'remove' })
+      });
+    }
+
+    // Wishlist Controls (Catalog + Bottom of Bag)
+    function syncCatalogWishlistHearts(productId, isSaved) {
+      document.querySelectorAll(`.btn-wishlist-card[data-wish-id="${productId}"]`).forEach(btn => {
+        btn.classList.toggle('saved', isSaved);
+        btn.textContent = isSaved ? '♥' : '♡';
+      });
+    }
+
+    function toggleWishlistFromCatalog(productId, btnEl) {
+      const existsIdx = wishlist.findIndex(w => getItemId(w) === String(productId));
+      if (existsIdx > -1) {
+        wishlist.splice(existsIdx, 1);
+        saveWishlist();
+        if (btnEl) {
+          btnEl.classList.remove('saved');
+          btnEl.textContent = '♡';
+        }
+        showToast('Removed from wishlist.');
+      } else {
+        const product = allProductsCache.find(p => String(p._id) === String(productId));
+        if (!product) return;
+        wishlist.push({
+          productId: product._id,
+          name: product.name,
+          price: Number(product.price),
+          image: product.image || product.imageUrl || '',
+          category: product.category || ''
+        });
+        saveWishlist();
+        if (btnEl) {
+          btnEl.classList.add('saved');
+          btnEl.textContent = '♥';
+        }
+        showToast('Saved to wishlist!', 'success', 'View Bag', openCartModal);
+      }
+    }
+
+    function saveBagItemToWishlist(productId) {
+      const item = currentCart.find(i => getItemId(i) === String(productId));
+      if (!item) return;
+
+      if (!wishlist.some(w => getItemId(w) === String(productId))) {
+        const cached = allProductsCache.find(p => String(p._id) === String(productId));
+        wishlist.push({
+          productId: getItemId(item),
+          name: item.name,
+          price: Number(item.price),
+          image: item.image || cached?.image || cached?.imageUrl || '',
+          category: item.category || cached?.category || ''
+        });
+        saveWishlist();
+        syncCatalogWishlistHearts(productId, true);
+      }
+      removeFromCart(productId);
+      showToast('Moved to your wishlist!', 'gold');
+    }
+
+    function removeFromWishlist(productId) {
+      wishlist = wishlist.filter(w => getItemId(w) !== String(productId));
+      saveWishlist();
+      syncCatalogWishlistHearts(productId, false);
+      renderCartModal();
+    }
+
+    async function moveWishlistToBag(productId) {
+      const token = localStorage.getItem('fc_token');
+      if (!token) {
+        pendingCartAction = { productId, btnEl: null, fromWishlist: true };
+        closeModal('cartModal');
+        openAuthModal('Log in to move wishlist items into your bag.');
+        return;
+      }
+      await addToCart(productId, null);
+      wishlist = wishlist.filter(w => getItemId(w) !== String(productId));
+      saveWishlist();
+      syncCatalogWishlistHearts(productId, false);
+      renderCartModal();
+    }
+
+    // Render Flipkart/Amazon-Style Shopping Bag + Discount Deduction + Bottom Wishlist
+    function renderCartModal() {
       const list = document.getElementById('cartItemsList');
       const summary = document.getElementById('cartSummary');
       const subtotalEl = document.getElementById('cartSubtotal');
+      const countEl = document.getElementById('cartItemCount');
+      const discountRow = document.getElementById('cartDiscountRow');
+      const discountLabel = document.getElementById('cartDiscountLabel');
+      const discountAmt = document.getElementById('cartDiscountAmt');
+      const netTotalEl = document.getElementById('cartNetTotal');
       const checkoutBtn = document.getElementById('checkoutBtn');
+      const offerPill = document.getElementById('appliedOfferPill');
+      const offerText = document.getElementById('appliedOfferText');
 
-      document.getElementById('cartMainView').style.display = 'block';
-      document.getElementById('cartReceiptView').style.display = 'none';
-      document.getElementById('checkoutStatus').textContent = '';
+      if (activeOffer) {
+        document.getElementById('couponInput').value = activeOffer.code;
+        offerText.textContent = `🎉 ${activeOffer.code} applied (${activeOffer.label})`;
+        offerPill.classList.add('visible');
+      } else {
+        offerPill.classList.remove('visible');
+      }
 
       if (!currentCart.length) {
         list.innerHTML = '<p style="font-size:13px; color:var(--text-muted); padding: 12px 0;">Your bag is empty. Add jerseys, kits, or sneakers from the catalog below!</p>';
         summary.style.display = 'none';
         checkoutBtn.disabled = true;
       } else {
-        const subtotal = currentCart.reduce((sum, item) => sum + (Number(item.price) * Number(item.quantity)), 0);
-        list.innerHTML = currentCart.map(item => `
-          <div class="cart-item-row">
-            <span>${escapeHtml(item.name)} <span style="color:var(--text-muted);">×${item.quantity}</span></span>
-            <strong>₹${Number(item.price) * Number(item.quantity)}</strong>
-          </div>
-        `).join('');
+        let subtotal = 0;
+        let totalItems = 0;
+
+        list.innerHTML = currentCart.map(item => {
+          const pid = escapeHtml(getItemId(item));
+          const qty = Number(item.quantity) || 1;
+          const unitPrice = Number(item.price) || 0;
+          const lineTotal = unitPrice * qty;
+          subtotal += lineTotal;
+          totalItems += qty;
+
+          const cached = allProductsCache.find(p => String(p._id) === pid);
+          const imgUrl = item.image || cached?.image || cached?.imageUrl || '';
+          const thumbHtml = imgUrl
+            ? `<img src="${escapeHtml(imgUrl)}" alt="${escapeHtml(item.name)}">`
+            : getCategoryArtwork(item.category || cached?.category || '');
+
+          return `
+            <div class="cart-card">
+              <div class="cart-card-top">
+                <div class="cart-thumb">${thumbHtml}</div>
+                <div class="cart-info">
+                  <div class="cart-item-name">${escapeHtml(item.name)}</div>
+                  <div class="cart-item-unit">₹${unitPrice} each</div>
+                </div>
+                <div class="cart-item-line-price">₹${lineTotal}</div>
+              </div>
+              <div class="cart-card-actions">
+                <div class="qty-stepper">
+                  <button type="button" class="qty-btn" onclick="updateCartQty('${pid}', -1)" aria-label="Decrease quantity">−</button>
+                  <span class="qty-val">${qty}</span>
+                  <button type="button" class="qty-btn" onclick="updateCartQty('${pid}', 1)" aria-label="Increase quantity">+</button>
+                </div>
+                <div class="cart-action-links">
+                  <button type="button" class="cart-text-btn" onclick="saveBagItemToWishlist('${pid}')">♡ Wishlist</button>
+                  <button type="button" class="cart-text-btn danger" onclick="removeFromCart('${pid}')">Remove</button>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        let discount = 0;
+        if (activeOffer) {
+          if (activeOffer.type === 'percent') {
+            discount = Math.round((subtotal * activeOffer.value) / 100);
+          } else if (activeOffer.type === 'flat') {
+            discount = Math.min(subtotal, activeOffer.value);
+          }
+        }
+        const netTotal = Math.max(0, subtotal - discount);
+
+        countEl.textContent = totalItems;
         subtotalEl.textContent = `₹${subtotal}`;
+        if (discount > 0) {
+          discountLabel.textContent = `Discount (${activeOffer.code})`;
+          discountAmt.textContent = `-₹${discount}`;
+          discountRow.style.display = 'flex';
+        } else {
+          discountRow.style.display = 'none';
+        }
+        netTotalEl.textContent = `₹${netTotal}`;
         summary.style.display = 'flex';
         checkoutBtn.disabled = false;
       }
 
-      document.getElementById('cartModal').classList.add('open');
+      // Render Wishlist at Bottom of Bag
+      const wishListEl = document.getElementById('cartWishlistList');
+      const wishCountEl = document.getElementById('wishlistCountLabel');
+      wishCountEl.textContent = `${wishlist.length} item${wishlist.length === 1 ? '' : 's'}`;
+
+      if (!wishlist.length) {
+        wishListEl.innerHTML = '<p style="font-size:12px; color:var(--text-muted);">No saved items yet. Tap ♡ on any product or bag item.</p>';
+      } else {
+        wishListEl.innerHTML = wishlist.map(w => {
+          const wid = escapeHtml(getItemId(w));
+          return `
+            <div class="wishlist-row">
+              <div class="wishlist-meta">
+                <div class="wishlist-name">${escapeHtml(w.name)}</div>
+                <div class="wishlist-price">₹${Number(w.price)}</div>
+              </div>
+              <div class="wishlist-btns">
+                <button type="button" class="btn-move-bag" onclick="moveWishlistToBag('${wid}')">+ Bag</button>
+                <button type="button" class="cart-text-btn danger" onclick="removeFromWishlist('${wid}')">×</button>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
     }
 
+    function openCartModal() {
+      document.getElementById('cartMainView').style.display = 'block';
+      document.getElementById('cartReceiptView').style.display = 'none';
+      document.getElementById('checkoutStatus').textContent = '';
+
+      const savedUser = JSON.parse(localStorage.getItem('fc_user') || 'null');
+      const savedPhone = savedUser?.phone || savedUser?.mobile || localStorage.getItem('fc_phone') || '';
+      const phoneInput = document.getElementById('checkoutPhone');
+      if (phoneInput && !phoneInput.value.trim() && savedPhone) {
+        phoneInput.value = savedPhone;
+      }
+
+      renderCartModal();
+      document.getElementById('cartModal').classList.add('open');
+    }
+    
     document.getElementById('cartBtn').addEventListener('click', openCartModal);
 
     // Checkout Order
     async function checkoutOrder() {
       if (!currentCart.length) return;
+      const token = localStorage.getItem('fc_token');
+      if (!token) {
+        closeModal('cartModal');
+        openAuthModal('Log in to complete your checkout.');
+        return;
+      }
+
       const checkoutBtn = document.getElementById('checkoutBtn');
       const statusEl = document.getElementById('checkoutStatus');
-      const token = localStorage.getItem('fc_token');
-      const couponCode = document.getElementById('couponInput').value.trim();
+      const couponCode = (document.getElementById('couponInput').value || activeOffer?.code || '').trim();
+      const rawPhone = document.getElementById('checkoutPhone').value.trim();
+      const cleanPhone = normalizeIndianPhone(rawPhone);
+
+      if (!cleanPhone) {
+        statusEl.textContent = 'Please enter a valid 10-digit mobile number for delivery updates.';
+        document.getElementById('checkoutPhone').focus();
+        return;
+      }
+
+      localStorage.setItem('fc_phone', cleanPhone);
+      const savedUser = JSON.parse(localStorage.getItem('fc_user') || 'null');
+      if (savedUser) {
+        savedUser.phone = cleanPhone;
+        localStorage.setItem('fc_user', JSON.stringify(savedUser));
+      }
 
       checkoutBtn.disabled = true;
       checkoutBtn.textContent = 'Processing Order...';
@@ -2448,13 +3261,18 @@
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          ...(token ? { Authorization: `Bearer ${token}` } : {})
+          Authorization: `Bearer ${token}`
         },
-        body: JSON.stringify({ sessionId, couponCode, deliveryType: 'hybrid' })
+        body: JSON.stringify({
+          sessionId,
+          couponCode,
+          deliveryType: 'hybrid',
+          phone: cleanPhone,
+          mobile: cleanPhone
+        })
       });
 
-      checkoutBtn.textContent = 'Secure Checkout ➔';
-
+      checkoutBtn.textContent = 'Secure Checkout →';
       if (!ok) {
         checkoutBtn.disabled = false;
         statusEl.textContent = data.error || 'Checkout failed. Please try again.';
@@ -2462,13 +3280,16 @@
       }
 
       currentCart = [];
+      activeOffer = null;
+      saveActiveOffer();
       syncCartBadge(false);
 
       document.getElementById('cartMainView').style.display = 'none';
       document.getElementById('cartReceiptView').style.display = 'block';
       document.getElementById('receiptDetails').innerHTML = `
         Order <strong>${escapeHtml(data.order.orderId)}</strong> is confirmed.<br>
-        Total Paid: <strong>₹${data.order.finalTotal}</strong>
+        Total Paid: <strong>₹${data.order.finalTotal}</strong><br>
+        Updates will be sent to <strong>+91 ${escapeHtml(cleanPhone)}</strong>
       `;
       showToast(`Order ${data.order.orderId} confirmed!`, 'success');
     }
@@ -2481,6 +3302,8 @@
       document.getElementById('tabRegister').classList.toggle('active', isRegister);
       document.getElementById('authNameWrap').style.display = isRegister ? 'block' : 'none';
       document.getElementById('authName').required = isRegister;
+      document.getElementById('authPhoneWrap').style.display = isRegister ? 'block' : 'none';
+      document.getElementById('authPhone').required = isRegister;
       document.getElementById('authSubmitBtn').textContent = isRegister ? 'Create Account' : 'Log In';
       document.getElementById('authStatus').textContent = '';
     }
@@ -2504,6 +3327,8 @@
         document.getElementById('authModalTitle').textContent = 'Your Profile';
         document.getElementById('profileName').textContent = savedUser.name;
         document.getElementById('profileEmail').textContent = savedUser.email || 'Signed in';
+        const phone = savedUser.phone || savedUser.mobile || localStorage.getItem('fc_phone') || '';
+        document.getElementById('profilePhone').textContent = phone ? `📱 +91 ${phone}` : '';
         document.getElementById('profileTier').textContent = savedUser.isPremium
           ? '👑 Premium Lounge VIP Member'
           : 'Standard Player Account';
@@ -2513,6 +3338,7 @@
         document.getElementById('authModalTitle').textContent = 'Player Account';
         document.getElementById('authStatus').textContent = notice;
       }
+
       document.getElementById('authModal').classList.add('open');
     }
 
@@ -2523,17 +3349,32 @@
       const name = document.getElementById('authName').value.trim();
       const email = document.getElementById('authEmail').value.trim();
       const password = document.getElementById('authPass').value.trim();
+      const rawPhone = document.getElementById('authPhone').value.trim();
       const status = document.getElementById('authStatus');
       const submitBtn = document.getElementById('authSubmitBtn');
+
+      let cleanPhone = '';
+      if (authMode === 'register') {
+        cleanPhone = normalizeIndianPhone(rawPhone);
+        if (!cleanPhone) {
+          status.textContent = 'Please enter a valid 10-digit mobile number.';
+          document.getElementById('authPhone').focus();
+          return;
+        }
+      }
 
       submitBtn.disabled = true;
       submitBtn.textContent = authMode === 'register' ? 'Creating Account...' : 'Logging In...';
       status.textContent = '';
 
+      const payload = authMode === 'register'
+        ? { action: authMode, name, email, password, phone: cleanPhone, mobile: cleanPhone }
+        : { action: authMode, email, password };
+
       const { ok, data } = await apiRequest('/auth', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: authMode, name, email, password })
+        body: JSON.stringify(payload)
       });
 
       submitBtn.disabled = false;
@@ -2544,11 +3385,30 @@
         return;
       }
 
+      const userToSave = {
+        ...data.user,
+        phone: data.user.phone || data.user.mobile || cleanPhone || localStorage.getItem('fc_phone') || ''
+      };
+      if (userToSave.phone) {
+        localStorage.setItem('fc_phone', userToSave.phone);
+      }
+
       localStorage.setItem('fc_token', data.token);
-      localStorage.setItem('fc_user', JSON.stringify(data.user));
+      localStorage.setItem('fc_user', JSON.stringify(userToSave));
       syncUserUI();
       closeModal('authModal');
-      showToast(`Welcome, ${data.user.name}!`, 'success');
+      showToast(`Welcome, ${userToSave.name}!`, 'success');
+
+      if (pendingCartAction) {
+        const { productId, btnEl, fromWishlist } = pendingCartAction;
+        pendingCartAction = null;
+        if (fromWishlist) {
+          await moveWishlistToBag(productId);
+          openCartModal();
+        } else {
+          await addToCart(productId, btnEl);
+        }
+      }
     }
 
     function logoutUser() {
@@ -2563,12 +3423,10 @@
     joinLoungeBtn.addEventListener('click', async () => {
       const token = localStorage.getItem('fc_token');
       const savedUser = JSON.parse(localStorage.getItem('fc_user') || 'null');
-
       if (!token) {
         openAuthModal('Log in or sign up to unlock the ₹21/Month Premium Lounge!');
         return;
       }
-
       if (savedUser?.isPremium) {
         showToast('Your Premium Lounge VIP membership is already active!', 'gold');
         return;
@@ -2583,9 +3441,8 @@
       });
 
       joinLoungeBtn.disabled = false;
-
       if (!ok) {
-        joinLoungeBtn.textContent = 'Join Premium Lounge ➔';
+        joinLoungeBtn.textContent = 'Join Premium Lounge →';
         showToast(data.error || 'Could not activate membership.', 'error');
         return;
       }
@@ -2596,8 +3453,8 @@
       syncUserUI();
 
       if (data.bonusCoupon) {
-        document.getElementById('couponInput').value = data.bonusCoupon;
-        showToast(`👑 VIP Active! Bonus code: ${data.bonusCoupon}`, 'gold', 'Copy', () => copyCoupon(data.bonusCoupon));
+        applyOfferObject(parseDiscountOffer(data.bonusCoupon, 'VIP Bonus Coupon'), false);
+        showToast(`VIP Active! Bonus code: ${data.bonusCoupon}`, 'gold', 'Copy', () => copyCoupon(data.bonusCoupon));
       } else {
         showToast('👑 Welcome to Fits Check Premium Lounge!', 'gold');
       }
