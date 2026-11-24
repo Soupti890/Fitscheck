@@ -12,7 +12,9 @@ const nodemailer = require('nodemailer');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const JWT_SECRET = process.env.JWT_SECRET || 'fc_9xK2mP7qR4vL8nZ1wB5yT3jH6dG0sA';
+const cleanEnv = (v) => String(v || '').replace(/^["']|["']$/g, '').trim();
+
+const JWT_SECRET = cleanEnv(process.env.JWT_SECRET) || 'CHANGE_THIS_IN_RENDER_ENV';
 const PREMIUM_PRICE = Number(process.env.PREMIUM_PRICE || 49);
 const PREMIUM_DISCOUNT_PERCENT = Number(process.env.PREMIUM_DISCOUNT_PERCENT || 12);
 
@@ -46,26 +48,37 @@ app.use('/api/auth', rateLimit({
 app.use(express.static(path.join(__dirname, 'public')));
 
 // ================= 1. MONGODB CONNECTION =================
-const rawUri = process.env.MONGODB_URI || 'mongodb+srv://wellbengalconsultancyservice_db_user:b3NoA15HaEhI8xtZ@ecommercecluster.fpe1bto.mongodb.net/fitscheck?compressors=zlib';
-const MONGODB_URI = rawUri.replace(/^["']|["']$/g, '').trim();
+const MONGODB_URI = cleanEnv(process.env.MONGODB_URI);
 
 if (!MONGODB_URI) {
-  console.error('❌ MONGODB_URI is missing in Environment Variables!');
+  console.error('❌ MONGODB_URI is missing in Render Environment Variables!');
 } else {
   mongoose.connect(MONGODB_URI)
     .then(() => console.log('✅ Connected to MongoDB Atlas!'))
     .catch(err => console.error('❌ MongoDB Connection Error:', err.message));
 }
-// ================= 2. EMAIL OTP MAILER=================
-const mailer = process.env.SMTP_USER ? nodemailer.createTransport({
-  host: process.env.SMTP_HOST || 'smtp.gmail.com',
-  port: Number(process.env.SMTP_PORT || 587),
-  secure: false,
+
+// ================= 2. EMAIL OTP MAILER =================
+const SMTP_HOST = cleanEnv(process.env.SMTP_HOST) || 'smtp.gmail.com';
+const SMTP_PORT = Number(cleanEnv(process.env.SMTP_PORT) || 587);
+const SMTP_USER = cleanEnv(process.env.SMTP_USER);
+const SMTP_PASS = cleanEnv(process.env.SMTP_PASS).replace(/\s+/g, ''); // Removes spaces from Gmail App Password
+
+const mailer = (SMTP_USER && SMTP_PASS) ? nodemailer.createTransport({
+  host: SMTP_HOST,
+  port: SMTP_PORT,
+  secure: SMTP_PORT === 465,
   auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS
+    user: SMTP_USER,
+    pass: SMTP_PASS
   }
 }) : null;
+
+if (mailer) {
+  console.log(`✅ SMTP Mailer Ready (${SMTP_USER} via ${SMTP_HOST}:${SMTP_PORT})`);
+} else {
+  console.error(`❌ SMTP not ready -> SMTP_USER set: ${Boolean(SMTP_USER)}, SMTP_PASS set: ${Boolean(SMTP_PASS)}`);
+}
 
 // ================= 3. DATABASE SCHEMAS =================
 const Product = mongoose.model('Product', new mongoose.Schema({
@@ -169,22 +182,25 @@ app.post('/api/auth/email/send-otp', async (req, res) => {
       return res.status(409).json({ error: 'Email already registered. Please Log In instead.' });
     }
 
+    if (!mailer) {
+      return res.status(500).json({ error: 'SMTP credentials not set in Environment Variables' });
+    }
+
     const code = String(crypto.randomInt(100000, 999999));
     await Otp.deleteMany({ channel: 'email', target: email });
     await Otp.create({ channel: 'email', target: email, codeHash: hashOtp(code) });
 
-    if (!mailer) return res.status(500).json({ error: 'SMTP credentials not set in Environment Variables' });
-
     await mailer.sendMail({
-      from: `"The FitsCheck™" <${process.env.SMTP_USER}>`,
+      from: `"The FitsCheck™" <${SMTP_USER}>`,
       to: email,
       subject: 'Your FitsCheck Sign-Up Verification OTP',
       text: `Your FitsCheck verification OTP is ${code}. Valid for 5 minutes.`
     });
 
     res.json({ success: true, message: 'Email OTP sent' });
-  } catch {
-    res.status(500).json({ error: 'Failed to send Email OTP' });
+  } catch (err) {
+    console.error('❌ Email OTP Error:', err.message);
+    res.status(500).json({ error: 'Failed to send Email OTP. Check Render Logs.' });
   }
 });
 
@@ -228,6 +244,7 @@ app.post('/api/auth/signup-with-otp', async (req, res) => {
     });
   } catch (err) {
     if (err.code === 11000) return res.status(409).json({ error: 'Account already exists. Please Log In.' });
+    console.error('❌ Sign Up Error:', err.message);
     res.status(500).json({ error: 'Sign up failed' });
   }
 });
@@ -259,7 +276,8 @@ app.post('/api/auth/login', async (req, res) => {
         fitCoins: user.fitCoins
       }
     });
-  } catch {
+  } catch (err) {
+    console.error('❌ Login Error:', err.message);
     res.status(500).json({ error: 'Login failed' });
   }
 });
@@ -270,6 +288,7 @@ app.post('/api/auth/login', async (req, res) => {
 app.post('/api/auth/whatsapp/send-otp', async (_req, res) => {
   res.status(501).json({ error: 'WhatsApp OTP not yet configured (Co-Dev TODO)' });
 });
+
 // ================= 5. PREMIUM (₹49 / 6M), SPIN WHEEL & PROFILE =================
 app.post('/api/premium', async (req, res) => {
   try {
@@ -377,7 +396,6 @@ app.post('/api/checkout', async (req, res) => {
       couponUsed: couponCode || 'None'
     });
 
-    // Award +30 FIT COINS on orders >= ₹600
     if (finalTotal >= 600) {
       user.fitCoins += 30;
       user.coinLedger.unshift({ label: `Order ${order.orderId} Reward`, delta: 30 });
@@ -385,7 +403,8 @@ app.post('/api/checkout', async (req, res) => {
     }
 
     res.status(201).json({ success: true, order, fitCoins: user.fitCoins });
-  } catch {
+  } catch (err) {
+    console.error('❌ Checkout Error:', err.message);
     res.status(500).json({ error: 'Checkout failed' });
   }
 });
@@ -416,13 +435,13 @@ app.post('/api/contact', async (req, res) => {
 
     const saved = await ContactMessage.create({ name, phone, email, message });
 
-    if (mailer && process.env.SMTP_USER) {
+    if (mailer && SMTP_USER) {
       await mailer.sendMail({
-        from: `"The FitsCheck™ Contact" <${process.env.SMTP_USER}>`,
-        to: process.env.SMTP_USER,
+        from: `"The FitsCheck™ Contact" <${SMTP_USER}>`,
+        to: SMTP_USER,
         subject: `New Inquiry from ${name}`,
         text: `Name: ${name}\nPhone: ${phone}\nEmail: ${email}\n\nMessage:\n${message}`
-      }).catch(() => {});
+      }).catch(err => console.error('❌ Contact Email Error:', err.message));
     }
 
     res.status(201).json({ success: true, id: saved._id });
