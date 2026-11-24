@@ -57,13 +57,13 @@ if (!MONGODB_URI) {
     .catch(err => console.error('❌ MongoDB Connection Error:', err.message));
 }
 // ================= 2. EMAIL OTP MAILER=================
-const mailer = process.env.wellbengalconsultancyservice@gmail.com ? nodemailer.createTransport({
-  host: process.env.smtp.gmail.com || 'smtp.gmail.com',
+const mailer = process.env.SMTP_USER ? nodemailer.createTransport({
+  host: process.env.SMTP_HOST || 'smtp.gmail.com',
   port: Number(process.env.SMTP_PORT || 587),
   secure: false,
   auth: {
-    user: process.env.wellbengalconsultancyservice@gmail.com,
-    pass: process.env.ymkumjakrlrhlqbm
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS
   }
 }) : null;
 
@@ -418,8 +418,8 @@ app.post('/api/contact', async (req, res) => {
 
     if (mailer && process.env.SMTP_USER) {
       await mailer.sendMail({
-        from: `"The FitsCheck™ Contact" <${process.env.wellbengalconsultancyservice@gmail.com}>`,
-        to: process.env.wellbengalconsultancyservice@gmail.com,
+        from: `"The FitsCheck™ Contact" <${process.env.SMTP_USER}>`,
+        to: process.env.SMTP_USER,
         subject: `New Inquiry from ${name}`,
         text: `Name: ${name}\nPhone: ${phone}\nEmail: ${email}\n\nMessage:\n${message}`
       }).catch(() => {});
