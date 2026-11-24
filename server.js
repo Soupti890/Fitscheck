@@ -56,14 +56,14 @@ if (!MONGODB_URI) {
     .then(() => console.log('✅ Connected to MongoDB Atlas!'))
     .catch(err => console.error('❌ MongoDB Connection Error:', err.message));
 }
-// ================= 2. EMAIL OTP MAILER (YOUR SECTION) =================
-const mailer = process.env.SMTP_USER ? nodemailer.createTransport({
-  host: process.env.SMTP_HOST || 'smtp.gmail.com',
+// ================= 2. EMAIL OTP MAILER=================
+const mailer = process.env.wellbengalconsultancyservice@gmail.com ? nodemailer.createTransport({
+  host: process.env.smtp.gmail.com || 'smtp.gmail.com',
   port: Number(process.env.SMTP_PORT || 587),
   secure: false,
   auth: {
-    user: process.env.SMTP_USER, // Your Gmail / SMTP email
-    pass: process.env.SMTP_PASS  // Your 16-char Gmail App Password
+    user: process.env.wellbengalconsultancyservice@gmail.com,
+    pass: process.env.ymkumjakrlrhlqbm
   }
 }) : null;
 
@@ -266,8 +266,6 @@ app.post('/api/auth/login', async (req, res) => {
 
 /* ============================================================================
    [CO-DEV SECTION 1: WHATSAPP OTP ROUTES]
-   Co-dev: Save hashed OTP to Otp model with channel: 'whatsapp' & target: mobile
-   so /api/auth/signup-with-otp works automatically for WhatsApp sign-ups too.
    ============================================================================ */
 app.post('/api/auth/whatsapp/send-otp', async (_req, res) => {
   res.status(501).json({ error: 'WhatsApp OTP not yet configured (Co-Dev TODO)' });
@@ -394,9 +392,6 @@ app.post('/api/checkout', async (req, res) => {
 
 /* ============================================================================
    [CO-DEV SECTION 2: PAYMENT GATEWAY INTEGRATION]
-   Co-dev: Add Razorpay / PhonePe / Cashfree order creation & signature verify:
-     - POST /api/payment/create-order
-     - POST /api/payment/verify
    ============================================================================ */
 app.post('/api/payment/create-order', async (_req, res) => {
   res.status(501).json({ error: 'Payment gateway not yet configured (Co-Dev TODO)' });
@@ -408,15 +403,12 @@ app.post('/api/payment/verify', async (_req, res) => {
 
 /* ============================================================================
    [CO-DEV SECTION 3: DELIVERY PARTNER INTEGRATION]
-   Co-dev: Add Shiprocket / Delhivery pincode ETA & shipment creation:
-     - GET  /api/delivery/check?pincode=XXXXXX
-     - POST /api/delivery/create-shipment/:orderId
    ============================================================================ */
 app.get('/api/delivery/check', async (_req, res) => {
   res.json({ serviceable: true, eta: '4-5 Days', note: 'Co-Dev delivery partner placeholder' });
 });
 
-// ================= 7. CONTACT US (SAVES TO MONGODB + EMAILS YOU) =================
+// ================= 7. CONTACT US (SAVES TO DB + EMAILS) =================
 app.post('/api/contact', async (req, res) => {
   try {
     const { name, phone, email, message } = req.body;
@@ -426,8 +418,8 @@ app.post('/api/contact', async (req, res) => {
 
     if (mailer && process.env.SMTP_USER) {
       await mailer.sendMail({
-        from: `"The FitsCheck™ Contact" <${process.env.SMTP_USER}>`,
-        to: process.env.SMTP_USER,
+        from: `"The FitsCheck™ Contact" <${process.env.wellbengalconsultancyservice@gmail.com}>`,
+        to: process.env.wellbengalconsultancyservice@gmail.com,
         subject: `New Inquiry from ${name}`,
         text: `Name: ${name}\nPhone: ${phone}\nEmail: ${email}\n\nMessage:\n${message}`
       }).catch(() => {});
