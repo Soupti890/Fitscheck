@@ -2,69 +2,115 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const crypto = require('crypto');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const nodemailer = require('nodemailer');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const JWT_SECRET = process.env.JWT_SECRET || 'fitscheck_super_secret_key_2026';
-const ADMIN_KEY = process.env.ADMIN_KEY || 'fitscheck_admin_123';
+const JWT_SECRET = process.env.JWT_SECRET || 'fc_9xK2mP7qR4vL8nZ1wB5yT3jH6dG0sA';
+const PREMIUM_PRICE = Number(process.env.PREMIUM_PRICE || 49);
+const PREMIUM_DISCOUNT_PERCENT = Number(process.env.PREMIUM_DISCOUNT_PERCENT || 12);
 
-app.use(cors());
-app.use(express.json());
+// ================= SECURITY MIDDLEWARE =================
+app.set('trust proxy', 1);
+app.use(helmet({ contentSecurityPolicy: false }));
+app.use(cors({ origin: process.env.ALLOWED_ORIGIN || '*' }));
+app.use(express.json({ limit: '50kb' }));
+
+// Strip MongoDB operators ($gt, $ne, etc.) to prevent NoSQL Injection
+function sanitizeObject(obj) {
+  if (!obj || typeof obj !== 'object') return;
+  for (const key of Object.keys(obj)) {
+    if (key.startsWith('$') || key.includes('.')) delete obj[key];
+    else if (typeof obj[key] === 'object') sanitizeObject(obj[key]);
+  }
+}
+app.use((req, _res, next) => {
+  sanitizeObject(req.body);
+  sanitizeObject(req.query);
+  next();
+});
+
+app.use('/api/', rateLimit({ windowMs: 15 * 60 * 1000, max: 200 }));
+app.use('/api/auth', rateLimit({
+  windowMs: 10 * 60 * 1000,
+  max: 15,
+  message: { error: 'Too many attempts. Please try again in 10 minutes.' }
+}));
+
 app.use(express.static(path.join(__dirname, 'public')));
 
-// 1. CONNECT TO MONGODB (Reads MONGODB_URI from Render Environment Variables)
-const rawUri = process.env.MONGODB_URI || '';
+// ================= 1. MONGODB CONNECTION =================
+const rawUri = process.env.MONGODB_URI || 'mongodb+srv://wellbengalconsultancyservice_db_user:b3NoA15HaEhI8xtZ@ecommercecluster.fpe1bto.mongodb.net/fitscheck?compressors=zlib';
 const MONGODB_URI = rawUri.replace(/^["']|["']$/g, '').trim();
 
 if (!MONGODB_URI) {
-  console.error('❌ MONGODB_URI is missing in Render Environment Variables!');
+  console.error('❌ MONGODB_URI is missing in Environment Variables!');
 } else {
   mongoose.connect(MONGODB_URI)
     .then(() => console.log('✅ Connected to MongoDB Atlas!'))
     .catch(err => console.error('❌ MongoDB Connection Error:', err.message));
 }
+// ================= 2. EMAIL OTP MAILER (YOUR SECTION) =================
+const mailer = process.env.SMTP_USER ? nodemailer.createTransport({
+  host: process.env.SMTP_HOST || 'smtp.gmail.com',
+  port: Number(process.env.SMTP_PORT || 587),
+  secure: false,
+  auth: {
+    user: process.env.SMTP_USER, // Your Gmail / SMTP email
+    pass: process.env.SMTP_PASS  // Your 16-char Gmail App Password
+  }
+}) : null;
 
-// 2. DATABASE SCHEMAS
+// ================= 3. DATABASE SCHEMAS =================
 const Product = mongoose.model('Product', new mongoose.Schema({
+  code: String,
   name: String,
   category: String,
   tag: String,
   price: Number,
-  premiumPrice: Number,
+  mrp: Number,
+  images: [String],
+  specs: Object,
   stock: { type: Number, default: 20 }
 }));
 
 const User = mongoose.model('User', new mongoose.Schema({
   name: String,
-  email: { type: String, unique: true },
-  phone: { type: String, default: '' },
-  passwordHash: String,
+  email: { type: String, unique: true, sparse: true },
+  phone: { type: String, unique: true, sparse: true },
+  passwordHash: { type: String, required: true },
   isPremium: { type: Boolean, default: false },
+  premiumExpiresAt: Date,
   lastSpinDate: String,
-  coupons: [String]
+  coupons: [String],
+  fitCoins: { type: Number, default: 50 },
+  coinLedger: [{ label: String, delta: Number, createdAt: { type: Date, default: Date.now } }]
 }, { timestamps: true }));
 
-const Cart = mongoose.model('Cart', new mongoose.Schema({
-  sessionId: { type: String, unique: true },
-  items: [{
-    productId: String,
-    name: String,
-    category: String,
-    price: Number,
-    premiumPrice: Number,
-    quantity: Number
-  }]
+const Otp = mongoose.model('Otp', new mongoose.Schema({
+  channel: { type: String, enum: ['email', 'whatsapp'], required: true },
+  target: { type: String, required: true },
+  codeHash: { type: String, required: true },
+  createdAt: { type: Date, default: Date.now, expires: 300 } // Auto-expires in 5 mins
 }));
 
 const Order = mongoose.model('Order', new mongoose.Schema({
   orderId: String,
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   userName: String,
   userEmail: String,
   userPhone: String,
-  deliveryType: { type: String, default: 'hybrid' },
+  address: String,
+  pincode: String,
+  paymentMode: { type: String, enum: ['UPI', 'CARD', 'NETBANKING', 'WALLET', 'EMI', 'COD'], default: 'COD' },
+  paymentStatus: { type: String, default: 'PENDING' },
+  deliveryEstimate: { type: String, default: '4-5 Days' },
   items: Array,
   subtotal: Number,
   discount: Number,
@@ -72,129 +118,191 @@ const Order = mongoose.model('Order', new mongoose.Schema({
   couponUsed: String
 }, { timestamps: true }));
 
-// Initial Seed Products
-const initialProducts = [
-  { name: 'Nike Dunk Low Retro Edition', category: 'shoes', tag: 'Dunk Low', price: 1199, premiumPrice: 949 },
-  { name: 'Air Jordan 1 Retro High', category: 'shoes', tag: 'Retro High', price: 1199, premiumPrice: 999 },
-  { name: 'Court Pro Classic Sneaker', category: 'shoes', tag: 'Court Pro', price: 899, premiumPrice: 699 },
-  { name: 'Real Madrid Mbappé #9 Home Jersey', category: 'jerseys', tag: 'MBAPPE', price: 499, premiumPrice: 379 },
-  { name: 'Argentina Messi #10 World Cup Jersey', category: 'jerseys', tag: 'MESSI', price: 549, premiumPrice: 419 },
-  { name: 'Al Nassr CR7 #7 Special Edition Jersey', category: 'jerseys', tag: 'CR7', price: 499, premiumPrice: 379 },
-  { name: 'Pro Training Sports Kit (Jersey + Shorts)', category: 'sports-kits', tag: 'Kits', price: 699, premiumPrice: 549 },
-  { name: 'Matchday Wristband & Socks Pack', category: 'sports-kits', tag: 'Kits', price: 120, premiumPrice: 80 },
-  { name: 'Ultimate Matchday Combo (Jersey + Shoes)', category: 'combo-packs', tag: 'Combo Packs', price: 1199, premiumPrice: 950 }
-];
+const ContactMessage = mongoose.model('ContactMessage', new mongoose.Schema({
+  name: String,
+  phone: String,
+  email: String,
+  message: String,
+  status: { type: String, default: 'NEW' }
+}, { timestamps: true }));
 
+// ================= HELPERS =================
 const wheelPrizes = [
-  { segment: 1, color: 'Red', label: '10% OFF Coupon', code: 'SPIN10', discountPercent: 10, weight: 35 },
-  { segment: 2, color: 'Gold', label: '15% OFF Coupon', code: 'SPIN15', discountPercent: 15, weight: 25 },
-  { segment: 3, color: 'Purple', label: '₹150 Flat Off', code: 'FLAT150', flatDiscount: 150, weight: 15 },
-  { segment: 4, color: 'Blue', label: '20% OFF Coupon', code: 'SPIN20', discountPercent: 20, weight: 20 },
-  { segment: 5, color: 'Green', label: '50% OFF Jackpot!', code: 'JACKPOT50', discountPercent: 50, weight: 5 }
+  { segment: 1, label: '10% OFF Coupon', code: 'SPIN10', discountPercent: 10, coins: 15, weight: 35 },
+  { segment: 2, label: '15% OFF Coupon', code: 'SPIN15', discountPercent: 15, coins: 25, weight: 25 },
+  { segment: 3, label: '₹150 Flat Off', code: 'FLAT150', flatDiscount: 150, coins: 20, weight: 15 },
+  { segment: 4, label: '20% OFF Coupon', code: 'SPIN20', discountPercent: 20, coins: 30, weight: 20 },
+  { segment: 5, label: '50% OFF Jackpot!', code: 'JACKPOT50', discountPercent: 50, coins: 100, weight: 5 }
 ];
 
-// Helpers
-function escapeRegex(str = '') {
-  return String(str).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+function hashOtp(code) {
+  return crypto.createHash('sha256').update(String(code)).digest('hex');
 }
 
-function normalizeIndianPhone(raw = '') {
-  let digits = String(raw).replace(/\D/g, '');
-  if (digits.length === 12 && digits.startsWith('91')) digits = digits.slice(2);
-  if (digits.length === 11 && digits.startsWith('0')) digits = digits.slice(1);
-  return /^\d{10}$/.test(digits) ? digits : null;
+function hasActivePremium(user) {
+  return Boolean(user && user.isPremium && (!user.premiumExpiresAt || user.premiumExpiresAt > new Date()));
+}
+
+function calcItemPrice(price, isVip) {
+  return isVip ? Math.round(price * (1 - PREMIUM_DISCOUNT_PERCENT / 100)) : price;
 }
 
 async function getAuthUser(req) {
-  const authHeader = req.headers.authorization;
-  if (!authHeader) return null;
+  const h = req.headers.authorization;
+  if (!h || !h.startsWith('Bearer ')) return null;
   try {
-    const decoded = jwt.verify(authHeader.split(' ')[1], JWT_SECRET);
-    return await User.findById(decoded.id);
+    return await User.findById(jwt.verify(h.split(' ')[1], JWT_SECRET).id);
   } catch {
     return null;
   }
 }
 
-// 3. API ROUTES
-app.get('/api/products', async (req, res) => {
+// ================= 4. AUTH ROUTES (EMAIL OTP SIGN UP + PASSWORD LOG IN) =================
+
+// SEND EMAIL OTP FOR SIGN UP
+app.post('/api/auth/email/send-otp', async (req, res) => {
   try {
-    if ((await Product.countDocuments()) === 0) await Product.insertMany(initialProducts);
-    const { category, tag, q } = req.query;
-    const filter = {};
-    if (category) filter.category = new RegExp(`^${escapeRegex(category)}$`, 'i');
-    if (tag) filter.tag = new RegExp(escapeRegex(tag), 'i');
-    if (q) {
-      const r = new RegExp(escapeRegex(q), 'i');
-      filter.$or = [{ name: r }, { category: r }, { tag: r }];
+    const email = String(req.body.email || '').trim().toLowerCase();
+    if (!email.includes('@')) return res.status(400).json({ error: 'Valid email address required' });
+
+    if (await User.findOne({ email })) {
+      return res.status(409).json({ error: 'Email already registered. Please Log In instead.' });
     }
-    const products = await Product.find(filter).lean();
-    res.json({ count: products.length, products });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+
+    const code = String(crypto.randomInt(100000, 999999));
+    await Otp.deleteMany({ channel: 'email', target: email });
+    await Otp.create({ channel: 'email', target: email, codeHash: hashOtp(code) });
+
+    if (!mailer) return res.status(500).json({ error: 'SMTP credentials not set in Environment Variables' });
+
+    await mailer.sendMail({
+      from: `"The FitsCheck™" <${process.env.SMTP_USER}>`,
+      to: email,
+      subject: 'Your FitsCheck Sign-Up Verification OTP',
+      text: `Your FitsCheck verification OTP is ${code}. Valid for 5 minutes.`
+    });
+
+    res.json({ success: true, message: 'Email OTP sent' });
+  } catch {
+    res.status(500).json({ error: 'Failed to send Email OTP' });
   }
 });
 
-app.post('/api/auth', async (req, res) => {
+// SINGLE-STEP SIGN UP: Verify OTP + Save User & Hashed Password in MongoDB
+app.post('/api/auth/signup-with-otp', async (req, res) => {
   try {
-    const { action, name, email, password, phone, mobile } = req.body;
-    const cleanEmail = String(email || '').trim().toLowerCase();
-    if (!cleanEmail || !password) {
-      return res.status(400).json({ error: 'Email and password required' });
+    const { channel = 'email', target, code, name, password } = req.body;
+    const cleanTarget = String(target || '').trim().toLowerCase();
+
+    if (!cleanTarget || !code || !password || password.length < 6) {
+      return res.status(400).json({ error: 'All fields and a password (min 6 chars) are required' });
     }
 
-    const emailQuery = { email: new RegExp(`^${escapeRegex(cleanEmail)}$`, 'i') };
+    const record = await Otp.findOne({ channel, target: cleanTarget, codeHash: hashOtp(code) });
+    if (!record) return res.status(400).json({ error: 'Invalid or expired OTP' });
+    await Otp.deleteOne({ _id: record._id });
 
-    if (action === 'register') {
-      const cleanPhone = normalizeIndianPhone(phone || mobile);
-      if (!cleanPhone) {
-        return res.status(400).json({ error: 'Please enter a valid 10-digit mobile number' });
-      }
-      if (await User.findOne(emailQuery)) {
-        return res.status(409).json({ error: 'Email already registered' });
-      }
+    const passwordHash = await bcrypt.hash(password, 12);
+    const userData = {
+      name: String(name || 'Player').trim(),
+      passwordHash,
+      coinLedger: [{ label: 'Welcome Bonus', delta: 50 }]
+    };
+    if (channel === 'email') userData.email = cleanTarget;
+    else userData.phone = cleanTarget;
 
-      const passwordHash = await bcrypt.hash(password, 10);
-      const u = await User.create({
-        name: String(name || 'Player').trim(),
-        email: cleanEmail,
-        phone: cleanPhone,
-        passwordHash
-      });
-      const token = jwt.sign({ id: u._id }, JWT_SECRET, { expiresIn: '7d' });
-      return res.status(201).json({
-        token,
-        user: { id: u._id, name: u.name, email: u.email, phone: u.phone, isPremium: false }
-      });
-    }
-
-    const user = await User.findOne(emailQuery);
-    if (!user || !(await bcrypt.compare(password, user.passwordHash))) {
-      return res.status(401).json({ error: 'Invalid email or password' });
-    }
+    const user = await User.create(userData);
     const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: '7d' });
-    res.json({
+
+    res.status(201).json({
+      success: true,
       token,
       user: {
         id: user._id,
         name: user.name,
-        email: user.email,
+        email: user.email || '',
         phone: user.phone || '',
-        isPremium: user.isPremium
+        isPremium: false,
+        fitCoins: user.fitCoins
       }
     });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    if (err.code === 11000) return res.status(409).json({ error: 'Account already exists. Please Log In.' });
+    res.status(500).json({ error: 'Sign up failed' });
+  }
+});
+
+// LOG IN: Email or Mobile Number + Password
+app.post('/api/auth/login', async (req, res) => {
+  try {
+    const identifier = String(req.body.identifier || '').trim().toLowerCase();
+    const password = String(req.body.password || '');
+    if (!identifier || !password) return res.status(400).json({ error: 'Email/Number and password required' });
+
+    const query = identifier.includes('@') ? { email: identifier } : { phone: identifier };
+    const user = await User.findOne(query);
+
+    if (!user || !user.passwordHash || !(await bcrypt.compare(password, user.passwordHash))) {
+      return res.status(401).json({ error: 'Invalid email/number or password' });
+    }
+
+    const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: '7d' });
+    res.json({
+      success: true,
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email || '',
+        phone: user.phone || '',
+        isPremium: hasActivePremium(user),
+        fitCoins: user.fitCoins
+      }
+    });
+  } catch {
+    res.status(500).json({ error: 'Login failed' });
+  }
+});
+
+/* ============================================================================
+   [CO-DEV SECTION 1: WHATSAPP OTP ROUTES]
+   Co-dev: Save hashed OTP to Otp model with channel: 'whatsapp' & target: mobile
+   so /api/auth/signup-with-otp works automatically for WhatsApp sign-ups too.
+   ============================================================================ */
+app.post('/api/auth/whatsapp/send-otp', async (_req, res) => {
+  res.status(501).json({ error: 'WhatsApp OTP not yet configured (Co-Dev TODO)' });
+});
+// ================= 5. PREMIUM (₹49 / 6M), SPIN WHEEL & PROFILE =================
+app.post('/api/premium', async (req, res) => {
+  try {
+    const user = await getAuthUser(req);
+    if (!user) return res.status(401).json({ error: 'Please log in first' });
+
+    const expiresAt = new Date();
+    expiresAt.setMonth(expiresAt.getMonth() + 6);
+    user.isPremium = true;
+    user.premiumExpiresAt = expiresAt;
+    await user.save();
+
+    res.json({
+      success: true,
+      pricePaid: PREMIUM_PRICE,
+      discountPercent: PREMIUM_DISCOUNT_PERCENT,
+      expiresAt
+    });
+  } catch {
+    res.status(500).json({ error: 'Could not activate premium' });
   }
 });
 
 app.post('/api/spin', async (req, res) => {
   try {
     const user = await getAuthUser(req);
-    const today = new Date().toISOString().split('T')[0];
-    if (user && user.lastSpinDate === today && !user.isPremium) {
-      return res.status(429).json({ error: 'Daily spin used! Join Premium Lounge (₹21/mo) for unlimited spins.' });
+    if (!user) return res.status(401).json({ error: 'Please log in first' });
+    if (!hasActivePremium(user)) {
+      return res.status(403).json({ error: `Join 6-Month Premium (₹${PREMIUM_PRICE}) to unlock the Spin Wheel.` });
     }
+
     const totalWeight = wheelPrizes.reduce((sum, p) => sum + p.weight, 0);
     let rand = Math.random() * totalWeight;
     let winningPrize = wheelPrizes[0];
@@ -202,141 +310,133 @@ app.post('/api/spin', async (req, res) => {
       if (rand < prize.weight) { winningPrize = prize; break; }
       rand -= prize.weight;
     }
-    if (user) {
-      user.lastSpinDate = today;
-      user.coupons.push(winningPrize.code);
-      await user.save();
-    }
-    res.json({ success: true, prize: winningPrize });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
 
-app.post('/api/premium', async (req, res) => {
-  try {
-    const user = await getAuthUser(req);
-    if (!user) return res.status(401).json({ error: 'Please log in first' });
-    user.isPremium = true;
-    user.coupons.push('VIPWELCOME25');
+    user.lastSpinDate = new Date().toISOString().split('T')[0];
+    user.coupons.push(winningPrize.code);
+    user.fitCoins += winningPrize.coins;
+    user.coinLedger.unshift({ label: `Spin Wheel (${winningPrize.label})`, delta: winningPrize.coins });
     await user.save();
-    res.json({ success: true, plan: 'Fits Check Premium Lounge', bonusCoupon: 'VIPWELCOME25' });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+
+    res.json({ success: true, prize: winningPrize, fitCoins: user.fitCoins });
+  } catch {
+    res.status(500).json({ error: 'Spin failed' });
   }
 });
 
-// Add, increment, decrement, or remove bag items (login required)
-app.put('/api/checkout', async (req, res) => {
+app.get('/api/profile', async (req, res) => {
   try {
     const user = await getAuthUser(req);
-    if (!user) {
-      return res.status(401).json({ error: 'Please log in to add or update items in your bag.' });
-    }
-
-    const { sessionId, productId, quantity = 1, action } = req.body;
-    if (!sessionId || !productId) {
-      return res.status(400).json({ error: 'Session ID and Product ID are required' });
-    }
-
-    let cart = await Cart.findOne({ sessionId });
-    if (!cart) cart = new Cart({ sessionId, items: [] });
-
-    const pid = String(productId);
-    const delta = Number(quantity);
-
-    if (action === 'remove') {
-      cart.items = cart.items.filter(i => i.productId !== pid);
-      await cart.save();
-      return res.json({ cart: cart.items });
-    }
-
-    const existing = cart.items.find(i => i.productId === pid);
-
-    if (existing) {
-      existing.quantity += delta;
-      if (existing.quantity <= 0) {
-        cart.items = cart.items.filter(i => i.productId !== pid);
-      }
-    } else if (delta > 0) {
-      const product = await Product.findById(productId);
-      if (!product) return res.status(404).json({ error: 'Product not found' });
-      cart.items.push({
-        productId: String(product._id),
-        name: product.name,
-        category: product.category,
-        price: product.price,
-        premiumPrice: product.premiumPrice,
-        quantity: delta
-      });
-    }
-
-    await cart.save();
-    res.json({ cart: cart.items });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+    if (!user) return res.status(401).json({ error: 'Unauthorized' });
+    const orders = await Order.find({ userId: user._id }).sort({ createdAt: -1 }).lean();
+    res.json({
+      user: {
+        name: user.name,
+        email: user.email || '',
+        phone: user.phone || '',
+        isPremium: hasActivePremium(user),
+        premiumExpiresAt: user.premiumExpiresAt,
+        fitCoins: user.fitCoins,
+        coinLedger: user.coinLedger
+      },
+      orders
+    });
+  } catch {
+    res.status(500).json({ error: 'Failed to load profile' });
   }
 });
 
-// Complete checkout (login + 10-digit mobile number required)
+// ================= 6. CHECKOUT (LOGIN + ADDRESS REQUIRED) =================
 app.post('/api/checkout', async (req, res) => {
   try {
     const user = await getAuthUser(req);
-    if (!user) {
-      return res.status(401).json({ error: 'Please log in to complete checkout.' });
+    if (!user) return res.status(401).json({ error: 'Please log in to place your order' });
+
+    const { items = [], phone, address, pincode, paymentMode = 'COD', couponCode } = req.body;
+    if (!items.length) return res.status(400).json({ error: 'Bag is empty' });
+    if (!address || String(address).trim().length < 5) {
+      return res.status(400).json({ error: 'Delivery address required' });
     }
 
-    const { sessionId, couponCode, deliveryType, phone, mobile } = req.body;
-    const cleanPhone = normalizeIndianPhone(phone || mobile || user.phone);
-    if (!cleanPhone) {
-      return res.status(400).json({ error: 'Please enter a valid 10-digit mobile number for delivery updates.' });
-    }
-
-    const cart = await Cart.findOne({ sessionId });
-    if (!cart || cart.items.length === 0) {
-      return res.status(400).json({ error: 'Your bag is empty!' });
-    }
-
-    // Save/update phone on the user profile if missing or updated
-    if (user.phone !== cleanPhone) {
-      user.phone = cleanPhone;
-      await user.save();
-    }
-
-    const isVip = Boolean(user.isPremium);
-    const subtotal = cart.items.reduce(
-      (sum, i) => sum + (isVip ? i.premiumPrice : i.price) * i.quantity,
-      0
-    );
-
-    let discount = 0;
-    const cleanCode = String(couponCode || '').trim().toUpperCase();
-    if (cleanCode) {
-      const prize = wheelPrizes.find(p => p.code === cleanCode);
-      if (prize?.discountPercent) discount = Math.round((subtotal * prize.discountPercent) / 100);
-      if (prize?.flatDiscount) discount = prize.flatDiscount;
-      if (cleanCode === 'VIPWELCOME25') discount = Math.round(subtotal * 0.25);
-    }
-    discount = Math.min(subtotal, discount);
+    const isVip = hasActivePremium(user);
+    const subtotal = items.reduce((sum, i) => sum + calcItemPrice(Number(i.price), isVip) * Number(i.qty || 1), 0);
+    const discount = String(couponCode || '').trim().toUpperCase() === 'SPIN20' ? Math.min(subtotal, 100) : 0;
+    const finalTotal = Math.max(0, subtotal - discount);
 
     const order = await Order.create({
       orderId: `FC-${Date.now().toString().slice(-5)}`,
+      userId: user._id,
       userName: user.name,
-      userEmail: user.email,
-      userPhone: cleanPhone,
-      deliveryType: deliveryType || 'hybrid',
-      items: cart.items,
+      userEmail: user.email || '',
+      userPhone: String(phone || user.phone || ''),
+      address: String(address).trim(),
+      pincode: String(pincode || '').trim(),
+      paymentMode,
+      paymentStatus: paymentMode === 'COD' ? 'COD_CONFIRMED' : 'PENDING',
+      items,
       subtotal,
       discount,
-      finalTotal: Math.max(0, subtotal - discount),
-      couponUsed: cleanCode || 'None'
+      finalTotal,
+      couponUsed: couponCode || 'None'
     });
 
-    await Cart.deleteOne({ sessionId });
-    res.status(201).json({ success: true, order });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+    // Award +30 FIT COINS on orders >= ₹600
+    if (finalTotal >= 600) {
+      user.fitCoins += 30;
+      user.coinLedger.unshift({ label: `Order ${order.orderId} Reward`, delta: 30 });
+      await user.save();
+    }
+
+    res.status(201).json({ success: true, order, fitCoins: user.fitCoins });
+  } catch {
+    res.status(500).json({ error: 'Checkout failed' });
   }
 });
 
-app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+/* ============================================================================
+   [CO-DEV SECTION 2: PAYMENT GATEWAY INTEGRATION]
+   Co-dev: Add Razorpay / PhonePe / Cashfree order creation & signature verify:
+     - POST /api/payment/create-order
+     - POST /api/payment/verify
+   ============================================================================ */
+app.post('/api/payment/create-order', async (_req, res) => {
+  res.status(501).json({ error: 'Payment gateway not yet configured (Co-Dev TODO)' });
+});
+
+app.post('/api/payment/verify', async (_req, res) => {
+  res.status(501).json({ error: 'Payment verification not yet configured (Co-Dev TODO)' });
+});
+
+/* ============================================================================
+   [CO-DEV SECTION 3: DELIVERY PARTNER INTEGRATION]
+   Co-dev: Add Shiprocket / Delhivery pincode ETA & shipment creation:
+     - GET  /api/delivery/check?pincode=XXXXXX
+     - POST /api/delivery/create-shipment/:orderId
+   ============================================================================ */
+app.get('/api/delivery/check', async (_req, res) => {
+  res.json({ serviceable: true, eta: '4-5 Days', note: 'Co-Dev delivery partner placeholder' });
+});
+
+// ================= 7. CONTACT US (SAVES TO MONGODB + EMAILS YOU) =================
+app.post('/api/contact', async (req, res) => {
+  try {
+    const { name, phone, email, message } = req.body;
+    if (!name || !message) return res.status(400).json({ error: 'Name and message are required' });
+
+    const saved = await ContactMessage.create({ name, phone, email, message });
+
+    if (mailer && process.env.SMTP_USER) {
+      await mailer.sendMail({
+        from: `"The FitsCheck™ Contact" <${process.env.SMTP_USER}>`,
+        to: process.env.SMTP_USER,
+        subject: `New Inquiry from ${name}`,
+        text: `Name: ${name}\nPhone: ${phone}\nEmail: ${email}\n\nMessage:\n${message}`
+      }).catch(() => {});
+    }
+
+    res.status(201).json({ success: true, id: saved._id });
+  } catch {
+    res.status(500).json({ error: 'Failed to submit message' });
+  }
+});
+
+app.listen(PORT, () => console.log(`🚀 FitsCheck server running on port ${PORT}`));
